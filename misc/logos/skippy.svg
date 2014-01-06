@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="297mm"
+   height="210mm"
+   id="svg2233"
+   sodipodi:version="0.32"
+   inkscape:version="0.45.1"
+   sodipodi:docbase="/home/lionel/Images/Vectoriel"
+   sodipodi:docname="kangourou.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   inkscape:export-filename="/home/lionel/Images/Vectoriel/kangourou.png"
+   inkscape:export-xdpi="71.941139"
+   inkscape:export-ydpi="71.941139">
+  <defs
+     id="defs2235" />
+  <sodipodi:namedview
+     inkscape:document-units="mm"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="1"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.0522857"
+     inkscape:cx="526.18109"
+     inkscape:cy="378.82574"
+     inkscape:current-layer="layer1"
+     id="namedview2237"
+     inkscape:window-width="1680"
+     inkscape:window-height="977"
+     inkscape:window-x="0"
+     inkscape:window-y="0" />
+  <metadata
+     id="metadata2239">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:#000000"
+       d="M 789.0868,676.97364 C 733.68418,671.14641 683.69548,662.60493 639.65583,638.85479 C 611.55364,623.6995 604.39664,601.8926 583.37903,559.56196 C 567.30778,527.1936 556.85431,494.55493 551.94841,461.42649 L 544.59782,411.78929 L 507.74388,389.04182 C 487.47421,376.53067 454.29109,350.08841 434.00346,330.28117 L 397.11692,294.26805 L 371.12168,307.52983 C 282.71745,352.63037 181.29552,374.21271 126.95909,359.48713 C 91.086081,349.76528 53.22223,315.30483 32.315561,273.35058 C 2.4975684,213.51367 13.433888,196.62314 47.727691,249.54748 C 59.384082,267.53635 80.68513,290.03958 95.06335,299.55463 C 161.6264,343.60398 260.9902,304.31678 345.04782,200.714 C 445.03695,77.475222 549.43912,36.387104 644.26724,82.954396 C 688.81678,104.83134 734.66483,145.03037 772.59739,195.47263 C 818.84469,256.97186 837.57816,266.81878 867.91115,245.57275 C 887.53803,231.82555 886.26757,227.66239 856.41711,207.90831 C 840.6704,197.48763 830.55133,185.76752 830.55133,177.95 C 830.55133,156.55304 854.60819,164.32425 893.82419,198.38938 C 905.50667,208.53742 921.51111,216.86867 929.38963,216.9032 C 937.26809,216.93767 956.35122,227.01193 971.7965,239.29041 C 987.24181,251.56882 1006.1562,263.57243 1013.8284,265.96495 C 1029.8525,270.96202 1037.237,280.18013 1037.3785,295.3625 C 1037.5292,311.52733 1021.2438,314.38588 990.70969,303.55425 C 972.71494,297.17077 952.98911,295.15803 934.01444,297.76917 C 908.42233,301.29101 902.57748,305.31758 885.5161,331.18065 C 862.92403,365.42753 814.24904,405.57573 793.60176,405.57573 C 783.24044,405.57573 783.45073,418.1586 759.90511,450.42938 C 717.7283,508.23559 695.45097,511.96847 670.93046,500.2161 C 661.00396,495.45841 651.82445,486.07295 650.53156,479.3595 C 648.50147,468.81808 650.98847,467.71466 668.76453,471.26985 C 695.99595,476.71613 712.62673,466.90932 719.41903,441.40011 C 730.91759,398.21576 700.54523,363.78196 665.17203,379.89903 C 631.032,395.45433 621.36731,445.3795 639.38948,513.0849 C 657.79756,582.24036 686.9097,603.96872 810.84232,641.05165 C 857.1753,654.91531 895.11373,668.44073 895.14993,671.10813 C 895.22779,676.84289 853.92686,683.7936 789.0868,676.97364 z "
+       id="path2408"
+       sodipodi:nodetypes="cssccccccssssssssssssssssssssssssssssc" />
+  </g>
+</svg>
