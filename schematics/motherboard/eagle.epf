@@ -346,13 +346,14 @@ UsedLibrary="/Users/huriaux/Developpement/Perso/skippycopter/schematics/common/e
 UsedLibrary="/Users/huriaux/Developpement/Perso/skippycopter/schematics/common/eagle-libs/OPL.lbr"
 UsedLibrary="/Users/huriaux/Developpement/Perso/skippycopter/schematics/common/eagle-libs/Power or GND .lbr"
 UsedLibrary="/Users/huriaux/Developpement/Perso/skippycopter/schematics/common/eagle-libs/template.lbr"
+UsedLibrary="/Users/huriaux/Developpement/Perso/skippycopter/schematics/common/eagle-libs/processors/stm32.lbr"
 
 [Win_1]
 Type="Control Panel"
-Loc="480 338 1586 733"
+Loc="121 340 1227 735"
 State=2
 Number=0
 
 [Desktop]
-Screen="1920 1200"
+Screen="3360 1200"
 Window="Win_1"
