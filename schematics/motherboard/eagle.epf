@@ -349,10 +349,10 @@ UsedLibrary="/Users/huriaux/Developpement/Perso/skippycopter/schematics/common/e
 
 [Win_1]
 Type="Control Panel"
-Loc="480 338 1586 733"
+Loc="121 340 1227 735"
 State=2
 Number=0
 
 [Desktop]
-Screen="1920 1200"
+Screen="3360 1200"
 Window="Win_1"
