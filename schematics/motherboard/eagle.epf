@@ -346,6 +346,7 @@ UsedLibrary="/Users/huriaux/Developpement/Perso/skippycopter/schematics/common/e
 UsedLibrary="/Users/huriaux/Developpement/Perso/skippycopter/schematics/common/eagle-libs/OPL.lbr"
 UsedLibrary="/Users/huriaux/Developpement/Perso/skippycopter/schematics/common/eagle-libs/Power or GND .lbr"
 UsedLibrary="/Users/huriaux/Developpement/Perso/skippycopter/schematics/common/eagle-libs/template.lbr"
+UsedLibrary="/Users/huriaux/Developpement/Perso/skippycopter/schematics/common/eagle-libs/processors/stm32.lbr"
 
 [Win_1]
 Type="Control Panel"
