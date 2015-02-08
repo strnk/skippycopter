@@ -85,6 +85,11 @@
 <smd name="P$1" x="0" y="0" dx="1.27" dy="0.635" layer="1" stop="no" cream="no"/>
 <text x="2.54" y="-5.08" size="0.254" layer="27">value</text>
 </package>
+<package name="5/2">
+<pad name="P$1" x="0" y="0" drill="2" diameter="7"/>
+<text x="-3" y="4" size="1.27" layer="25">&gt;NAME</text>
+<circle x="0" y="0" radius="3.75" width="0.127" layer="25"/>
+</package>
 </packages>
 <symbols>
 <symbol name="PAD">
@@ -137,6 +142,21 @@
 <device name="" package="SMD5.08-10.16">
 <connects>
 <connect gate="1" pin="P" pad="P$1"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="5/2">
+<gates>
+<gate name="G$1" symbol="PAD" x="-2.54" y="0"/>
+</gates>
+<devices>
+<device name="" package="5/2">
+<connects>
+<connect gate="G$1" pin="P" pad="P$1"/>
 </connects>
 <technologies>
 <technology name=""/>
