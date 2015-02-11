@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="6.5.0">
+<eagle version="7.2.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -171,12 +171,6 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <text x="-2.54" y="-2.54" size="1.778" layer="96">&gt;VALUE</text>
 <pin name="GND" x="0" y="2.54" visible="off" length="short" direction="sup" rot="R270"/>
 </symbol>
-<symbol name="5V">
-<wire x1="0.762" y1="1.27" x2="0" y2="2.54" width="0.254" layer="94"/>
-<wire x1="0" y1="2.54" x2="-0.762" y2="1.27" width="0.254" layer="94"/>
-<text x="-1.016" y="3.556" size="1.778" layer="96">&gt;VALUE</text>
-<pin name="5V" x="0" y="0" visible="off" length="short" direction="sup" rot="R90"/>
-</symbol>
 <symbol name="3.3V">
 <wire x1="0.762" y1="1.27" x2="0" y2="2.54" width="0.254" layer="94"/>
 <wire x1="0" y1="2.54" x2="-0.762" y2="1.27" width="0.254" layer="94"/>
@@ -218,19 +212,6 @@ Generic symbol for the battery input to a system.</description>
 <description>&lt;b&gt;SUPPLY SYMBOL&lt;/b&gt;</description>
 <gates>
 <gate name="1" symbol="DGND" x="0" y="0"/>
-</gates>
-<devices>
-<device name="">
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-</devices>
-</deviceset>
-<deviceset name="5V" prefix="SUPPLY">
-<description>5V supply symbol</description>
-<gates>
-<gate name="G$1" symbol="5V" x="0" y="0"/>
 </gates>
 <devices>
 <device name="">
@@ -3692,12 +3673,12 @@ Generic symbol for the battery input to a system.</description>
 <circle x="0" y="0" radius="3.75" width="0.127" layer="25"/>
 </package>
 <package name="SMD5.08-10.16">
-<rectangle x1="-2.54" y1="-5.08" x2="2.54" y2="5.08" layer="1"/>
 <text x="-2.794" y="-5.08" size="1.27" layer="25" rot="R90">&gt;NAME</text>
 <rectangle x1="-2.794" y1="-5.334" x2="2.794" y2="5.334" layer="29"/>
 <rectangle x1="-2.54" y1="-5.08" x2="2.54" y2="5.08" layer="31"/>
-<smd name="P$1" x="0" y="0" dx="1.27" dy="0.635" layer="1" stop="no" cream="no"/>
 <text x="2.54" y="-5.08" size="0.254" layer="27">value</text>
+<smd name="P$2" x="0" y="0" dx="10.16" dy="5.08" layer="1" rot="R90"/>
+<smd name="P$1" x="0" y="0" dx="10.16" dy="5.08" layer="16" rot="R90"/>
 </package>
 <package name="AVR_ICSP">
 <description>&lt;b&gt;PIN HEADER&lt;/b&gt;</description>
@@ -3819,7 +3800,7 @@ Generic symbol for the battery input to a system.</description>
 <devices>
 <device name="" package="SMD5.08-10.16">
 <connects>
-<connect gate="1" pin="P" pad="P$1"/>
+<connect gate="1" pin="P" pad="P$1 P$2"/>
 </connects>
 <technologies>
 <technology name=""/>
@@ -7157,7 +7138,6 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <part name="GND9" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="GND10" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="SUPPLY6" library="SparkFun-Aesthetics" deviceset="V_BATT" device=""/>
-<part name="SUPPLY8" library="SparkFun-Aesthetics" deviceset="5V" device=""/>
 <part name="GND11" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="U$1" library="dcdcconv" deviceset="AD2302ARDZ-3.3" device=""/>
 <part name="SUPPLY7" library="SparkFun-Aesthetics" deviceset="3.3V" device=""/>
@@ -7192,6 +7172,10 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <part name="H3" library="holes" deviceset="MOUNT-PAD-ROUND" device="3.0"/>
 <part name="H4" library="holes" deviceset="MOUNT-PAD-ROUND" device="3.0"/>
 <part name="JP3" library="SparkFun-Connectors" deviceset="M02" device="PTH"/>
+<part name="SUPPLY8" library="SparkFun-Aesthetics" deviceset="3.3V" device=""/>
+<part name="JP2" library="SparkFun-Connectors" deviceset="M02" device="PTH"/>
+<part name="GND19" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
+<part name="GND20" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -7238,7 +7222,6 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <instance part="GND9" gate="1" x="116.84" y="48.26"/>
 <instance part="GND10" gate="1" x="15.24" y="53.34"/>
 <instance part="SUPPLY6" gate="G$1" x="15.24" y="68.58"/>
-<instance part="SUPPLY8" gate="G$1" x="45.72" y="147.32"/>
 <instance part="GND11" gate="1" x="66.04" y="142.24"/>
 <instance part="U$1" gate="G$1" x="53.34" y="58.42"/>
 <instance part="SUPPLY7" gate="G$1" x="129.54" y="63.5"/>
@@ -7273,6 +7256,10 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <instance part="H3" gate="G$1" x="10.16" y="5.08"/>
 <instance part="H4" gate="G$1" x="48.26" y="20.32"/>
 <instance part="JP3" gate="G$1" x="261.62" y="86.36" rot="R180"/>
+<instance part="SUPPLY8" gate="G$1" x="45.72" y="147.32"/>
+<instance part="JP2" gate="G$1" x="144.78" y="60.96" rot="R180"/>
+<instance part="GND19" gate="1" x="134.62" y="53.34"/>
+<instance part="GND20" gate="1" x="48.26" y="10.16"/>
 </instances>
 <busses>
 </busses>
@@ -7435,6 +7422,18 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <pinref part="R7" gate="G$1" pin="1"/>
 <pinref part="GND18" gate="1" pin="GND"/>
 </segment>
+<segment>
+<pinref part="JP2" gate="G$1" pin="2"/>
+<pinref part="GND19" gate="1" pin="GND"/>
+<wire x1="137.16" y1="58.42" x2="134.62" y2="58.42" width="0.1524" layer="91"/>
+<wire x1="134.62" y1="58.42" x2="134.62" y2="55.88" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<wire x1="48.26" y1="20.32" x2="10.16" y2="20.32" width="0.1524" layer="91"/>
+<wire x1="10.16" y1="20.32" x2="10.16" y2="5.08" width="0.1524" layer="91"/>
+<pinref part="GND20" gate="1" pin="GND"/>
+<wire x1="48.26" y1="20.32" x2="48.26" y2="12.7" width="0.1524" layer="91"/>
+</segment>
 </net>
 <net name="N$1" class="0">
 <segment>
@@ -7464,13 +7463,6 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <pinref part="U$1" gate="G$1" pin="BST"/>
 </segment>
 </net>
-<net name="5V" class="0">
-<segment>
-<pinref part="SUPPLY8" gate="G$1" pin="5V"/>
-<pinref part="IC1" gate="G$1" pin="VCC"/>
-<wire x1="45.72" y1="147.32" x2="45.72" y2="144.78" width="0.1524" layer="91"/>
-</segment>
-</net>
 <net name="N$3" class="0">
 <segment>
 <pinref part="U$1" gate="G$1" pin="PGOOD"/>
@@ -7496,6 +7488,9 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <pinref part="SUPPLY7" gate="G$1" pin="3.3V"/>
 <junction x="104.14" y="60.96"/>
 <junction x="116.84" y="60.96"/>
+<pinref part="JP2" gate="G$1" pin="1"/>
+<wire x1="137.16" y1="60.96" x2="129.54" y2="60.96" width="0.1524" layer="91"/>
+<junction x="129.54" y="60.96"/>
 </segment>
 <segment>
 <pinref part="SUPPLY10" gate="G$1" pin="3.3V"/>
@@ -7533,6 +7528,11 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <pinref part="R5" gate="G$1" pin="2"/>
 <pinref part="SUPPLY13" gate="G$1" pin="3.3V"/>
 </segment>
+<segment>
+<pinref part="IC1" gate="G$1" pin="VCC"/>
+<wire x1="45.72" y1="147.32" x2="45.72" y2="144.78" width="0.1524" layer="91"/>
+<pinref part="SUPPLY8" gate="G$1" pin="3.3V"/>
+</segment>
 </net>
 <net name="N$4" class="0">
 <segment>
@@ -7562,9 +7562,9 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <label x="17.78" y="81.28" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="IC2" gate="G$1" pin="(ADC7)PA7"/>
-<wire x1="228.6" y1="147.32" x2="238.76" y2="147.32" width="0.1524" layer="91"/>
-<label x="228.6" y="147.32" size="1.778" layer="95"/>
+<label x="231.14" y="78.74" size="1.778" layer="95"/>
+<pinref part="IC2" gate="G$1" pin="(OC2)PD7"/>
+<wire x1="228.6" y1="78.74" x2="238.76" y2="78.74" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="TCK" class="0">
@@ -7687,11 +7687,7 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 </sheet>
 </sheets>
 <errors>
-<approved hash="104,1,45.72,144.78,IC1,VCC,5V,,,"/>
-<approved hash="106,1,45.72,147.32,5V,,,,,"/>
-<approved hash="106,1,45.72,144.78,5V,,,,,"/>
 <approved hash="108,1,15.24,66.04,V_BATT,,,,,"/>
-<approved hash="108,1,129.54,60.96,3.3V,,,,,"/>
 <approved hash="108,1,182.88,147.32,NSRST,,,,,"/>
 </errors>
 </schematic>
