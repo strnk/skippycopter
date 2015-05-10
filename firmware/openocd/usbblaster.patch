@@ -1,0 +1,26 @@
+From dd33b238e4e0b0768fbe3b302c881362786fd894 Mon Sep 17 00:00:00 2001
+From: strnk <c.huriaux@gmail.com>
+Date: Sun, 10 May 2015 15:12:49 +0200
+Subject: [PATCH] USB Blaster UDEV rule
+
+---
+ contrib/99-openocd.rules | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/contrib/99-openocd.rules b/contrib/99-openocd.rules
+index d810fca..e46b385 100644
+--- a/contrib/99-openocd.rules
++++ b/contrib/99-openocd.rules
+@@ -71,6 +71,9 @@ ATTRS{idVendor}=="0640", ATTRS{idProduct}=="002c", MODE="664", GROUP="plugdev"
+ # Hitex STM32-PerformanceStick
+ ATTRS{idVendor}=="0640", ATTRS{idProduct}=="002d", MODE="664", GROUP="plugdev"
+ 
++# Altera USB Blaster
++ATTRS{idVendor}=="09fb", ATTRS{idProduct}=="6001", MODE="664", GROUP="plugdev"
++
+ # Amontec JTAGkey-HiSpeed
+ ATTRS{idVendor}=="0fbb", ATTRS{idProduct}=="1000", MODE="664", GROUP="plugdev"
+ 
+-- 
+1.9.1
+

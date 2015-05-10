@@ -1,0 +1,216 @@
+From 903dbb387d3ac7e9a127fe3771c2c8d378821fce Mon Sep 17 00:00:00 2001
+From: strnk <c.huriaux@gmail.com>
+Date: Sun, 10 May 2015 14:41:29 +0200
+Subject: [PATCH] AVR fuse/signature read
+
+---
+ src/flash/nor/avrf.c | 186 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 186 insertions(+)
+
+diff --git a/src/flash/nor/avrf.c b/src/flash/nor/avrf.c
+index 1984c9e..86ef305 100644
+--- a/src/flash/nor/avrf.c
++++ b/src/flash/nor/avrf.c
+@@ -454,6 +454,180 @@ COMMAND_HANDLER(avrf_handle_mass_erase_command)
+ 	return ERROR_OK;
+ }
+ 
++static int avr_jtagprg_readbits(struct avr_common *avr)
++{
++	uint32_t ext = 0, hi = 0, lo = 0, lock = 0;
++
++	avr_jtag_sendinstr(avr->jtag_info.tap, NULL, AVR_JTAG_INS_PROG_COMMANDS);
++	// Enter Fuse/Lock Bit Read
++	avr_jtag_senddat(avr->jtag_info.tap, NULL, 0x2304, AVR_JTAG_REG_ProgrammingCommand_Len);
++	// Read Fuses and Lock Bits
++	avr_jtag_senddat(avr->jtag_info.tap, NULL, 0x3A00, AVR_JTAG_REG_ProgrammingCommand_Len);
++	avr_jtag_senddat(avr->jtag_info.tap, &ext, 0x3E00, AVR_JTAG_REG_ProgrammingCommand_Len);
++	avr_jtag_senddat(avr->jtag_info.tap, &hi, 0x3200, AVR_JTAG_REG_ProgrammingCommand_Len);
++	avr_jtag_senddat(avr->jtag_info.tap, &lo, 0x3600, AVR_JTAG_REG_ProgrammingCommand_Len);
++	avr_jtag_senddat(avr->jtag_info.tap, &lock, 0x3700, AVR_JTAG_REG_ProgrammingCommand_Len);
++
++	if (ERROR_OK != mcu_execute_queue())
++	{
++		LOG_INFO("failure");
++		return ERROR_FAIL;
++	}
++
++	LOG_INFO("Fuse Ext byte  = 0x%02" PRIx32 "", (uint8_t)ext);
++	LOG_INFO("Fuse High byte = 0x%02" PRIx32 "", (uint8_t)hi);
++	LOG_INFO("Fuse Low byte  = 0x%02" PRIx32 "", (uint8_t)lo);
++	LOG_INFO("Lock bits      = 0x%02" PRIx32 "", (uint8_t)lock);
++	return ERROR_OK;
++}
++
++static int avrf_read_bits(struct flash_bank *bank)
++{
++	struct target *target = bank->target;
++	struct avr_common *avr = target->arch_info;
++
++	if (target->state != TARGET_HALTED)
++	{
++		LOG_ERROR("Target not halted");
++		return ERROR_TARGET_NOT_HALTED;
++	}
++
++	if ((ERROR_OK != avr_jtagprg_enterprogmode(avr))
++		|| (ERROR_OK != avr_jtagprg_readbits(avr))
++		|| (ERROR_OK != avr_jtagprg_leaveprogmode(avr)))
++	{
++		return ERROR_FAIL;
++	}
++
++	return ERROR_OK;
++}
++
++/* XXX: Check your actually 'read_bits' commands before using it. */
++COMMAND_HANDLER(avrf_handle_read_bits_command)
++{
++	if (CMD_ARGC < 1)
++	{
++		command_print(CMD_CTX, "avr read_bits <bank>");
++		return ERROR_OK;
++	}
++
++	struct flash_bank *bank;
++	int retval = CALL_COMMAND_HANDLER(flash_command_get_bank, 0, &bank);
++	if (ERROR_OK != retval)
++		return retval;
++
++	if (avrf_read_bits(bank) == ERROR_OK)
++	{
++		command_print(CMD_CTX, "avr read bits success");
++	}
++	else
++	{
++		command_print(CMD_CTX, "avr read bits failure");
++	}
++
++	LOG_DEBUG("%s", __FUNCTION__);
++	return ERROR_OK;
++}
++
++/* avrf read_byte <bank> <type> <addr> */
++#define AVR_READ_BYTE_TYPE_SIGN	0x00	/* for Signature byte */
++#define AVR_READ_BYTE_TYPE_CALI	0x01	/* for Calibration byte */
++#define AVR_READ_BYTE_TYPE_UNKNOWN	0x02	/* unknown type */
++
++static int avr_jtagprg_readbyte(struct avr_common *avr, uint8_t type, uint8_t addr)
++{
++	uint32_t res;
++
++	avr_jtag_sendinstr(avr->jtag_info.tap, NULL, AVR_JTAG_INS_PROG_COMMANDS);
++	// Enter XXX Byte Read
++	avr_jtag_senddat(avr->jtag_info.tap, NULL, 0x2308, AVR_JTAG_REG_ProgrammingCommand_Len);
++	// Load Address Byte
++	avr_jtag_senddat(avr->jtag_info.tap, NULL, 0x0300 | addr, AVR_JTAG_REG_ProgrammingCommand_Len);
++	// Read XXX Byte
++	if (type != AVR_READ_BYTE_TYPE_SIGN && type != AVR_READ_BYTE_TYPE_UNKNOWN)
++		return ERROR_FAIL;
++
++	if (type == AVR_READ_BYTE_TYPE_SIGN) {
++		avr_jtag_senddat(avr->jtag_info.tap, NULL, 0x3200, AVR_JTAG_REG_ProgrammingCommand_Len);
++		avr_jtag_senddat(avr->jtag_info.tap, &res, 0x3300, AVR_JTAG_REG_ProgrammingCommand_Len);
++	} else if (type == AVR_READ_BYTE_TYPE_CALI) {
++		avr_jtag_senddat(avr->jtag_info.tap, NULL, 0x3600, AVR_JTAG_REG_ProgrammingCommand_Len);
++		avr_jtag_senddat(avr->jtag_info.tap, &res, 0x3700, AVR_JTAG_REG_ProgrammingCommand_Len);
++	}
++
++	if (ERROR_OK != mcu_execute_queue())
++	{
++		LOG_INFO("failure");
++		return ERROR_FAIL;
++	}
++	LOG_INFO("%s byte[0x%04" PRIx32 "]" " = 0x%02" PRIx32 "",
++		 type == AVR_READ_BYTE_TYPE_SIGN ? "Sign" : "Cali",
++		 addr, (uint8_t)res);
++
++	return ERROR_OK;
++}
++
++static int avrf_read_byte(struct flash_bank *bank, uint8_t type, uint8_t addr)
++{
++	struct target *target = bank->target;
++	struct avr_common *avr = target->arch_info;
++
++	if (target->state != TARGET_HALTED)
++	{
++		LOG_ERROR("Target not halted");
++		return ERROR_TARGET_NOT_HALTED;
++	}
++
++	if ((ERROR_OK != avr_jtagprg_enterprogmode(avr))
++		|| (ERROR_OK != avr_jtagprg_readbyte(avr, type, addr))
++		|| (ERROR_OK != avr_jtagprg_leaveprogmode(avr)))
++	{
++		return ERROR_FAIL;
++	}
++
++	return ERROR_OK;
++}
++
++/* XXX: Check your actually 'read_byte' commands before using it. */
++COMMAND_HANDLER(avrf_handle_read_byte_command)
++{
++	int retval;
++	struct flash_bank *bank;
++	uint8_t addr, type;
++
++	if (CMD_ARGC < 3)
++	{
++		command_print(CMD_CTX, "avr read_byte <bank> <type> <addr>");
++		return ERROR_OK;
++	}
++
++	retval = CALL_COMMAND_HANDLER(flash_command_get_bank, 0, &bank);
++	if (ERROR_OK != retval)
++		return retval;
++
++	if (0 == strncmp(CMD_ARGV[1], "sign", 4))
++		type = AVR_READ_BYTE_TYPE_SIGN;
++	else if (0 == strncmp(CMD_ARGV[1], "cali", 4))
++		type = AVR_READ_BYTE_TYPE_CALI;
++	else
++		type = AVR_READ_BYTE_TYPE_UNKNOWN;
++	if (type == AVR_READ_BYTE_TYPE_UNKNOWN)
++		return ERROR_COMMAND_SYNTAX_ERROR;
++
++	COMMAND_PARSE_NUMBER(u8, CMD_ARGV[2], addr);
++
++	if (avrf_read_byte(bank, type, addr) == ERROR_OK)
++	{
++		command_print(CMD_CTX, "avr read_byte success");
++	}
++	else
++	{
++		command_print(CMD_CTX, "avr read_byte failure");
++	}
++
++	return ERROR_OK;
++}
++
+ static const struct command_registration avrf_exec_command_handlers[] = {
+ 	{
+ 		.name = "mass_erase",
+@@ -462,6 +636,18 @@ static const struct command_registration avrf_exec_command_handlers[] = {
+ 		.mode = COMMAND_EXEC,
+ 		.help = "erase entire device",
+ 	},
++	{
++		.name = "read_bits",
++		.handler = avrf_handle_read_bits_command,
++		.mode = COMMAND_EXEC,
++		.help = "read FUSE/Lock bits",
++	},
++	{
++		.name = "read_byte",
++		.handler = avrf_handle_read_byte_command,
++		.mode = COMMAND_EXEC,
++		.help = "read Sign/Cali Byte",
++	},
+ 	COMMAND_REGISTRATION_DONE
+ };
+ static const struct command_registration avrf_command_handlers[] = {
+-- 
+1.9.1
+
