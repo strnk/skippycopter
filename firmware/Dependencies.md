@@ -39,4 +39,14 @@ Finally, apply the patch adding the Altera USB blaster UDEV rule and copy the ru
 	git apply --stat ~/skippycopter/firmware/openocd/usbblaster.patch
 	sudo cp contrib/99-openocd.rules /etc/udev/rules.d/
 
-	
+### libopencm3
+Install the *arm-none-eabi* cross-compilation toolchain (available in Debian repos). Do **NOT** install the *arm-linux-gnueabi*, which is not suitable for bare-metal targets.
+
+	sudo apt-get install gcc-arm-none-eabi libnewlib-arm-none-eabi
+
+Clone the libopencm3 and compile it:
+
+	git clone git://github.com/libopencm3/libopencm3.git
+	cd libopencm3
+	make
+	sudo make install

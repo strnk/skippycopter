@@ -7,7 +7,7 @@ S_SHUTDOWN=$(SCRIPTS_DIR)/shutdown.cfg
 
 
 ## Boards
-BOARDS=powerboard
+BOARDS=powerboard motherboard
 
 firmware: $(BOARDS)
 
@@ -15,6 +15,11 @@ firmware: $(BOARDS)
 powerboard: powerboard/powerboard.hex
 powerboard/powerboard.hex:
 	make -C powerboard
+	
+# Motherboard
+motherboard: motherboard/motherboard.hex
+motherboard/motherboard.hex:
+	make -C motherboard
 	
 
 ## JTAG flash rules

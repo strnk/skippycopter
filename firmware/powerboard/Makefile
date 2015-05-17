@@ -1,6 +1,16 @@
+PREFIX		?= avr
+CC			:= $(PREFIX)-gcc
+CXX			:= $(PREFIX)-g++
+LD			:= $(PREFIX)-gcc
+AR			:= $(PREFIX)-ar
+AS			:= $(PREFIX)-as
+OBJCOPY		:= $(PREFIX)-objcopy
+OBJDUMP		:= $(PREFIX)-objdump
+GDB			:= $(PREFIX)-gdb
+
 FIRMWARE=powerboard
 MCU=atmega164p
-F_CPU=8000000
+F_CPU=1000000
 
 SRC=main.c
 OBJS=$(SRC:.c=.o)
@@ -14,7 +24,7 @@ all: $(FIRMWARE) hex
 
 hex: $(FIRMWARE).hex
 $(FIRMWARE).hex: $(FIRMWARE).elf
-	avr-objcopy -O ihex $(FIRMWARE).elf $(FIRMWARE).hex
+	$(OBJCOPY) -O ihex $(FIRMWARE).elf $(FIRMWARE).hex
 
 #
 # ELF compilation
@@ -22,10 +32,10 @@ $(FIRMWARE).hex: $(FIRMWARE).elf
 
 $(FIRMWARE): $(FIRMWARE).elf
 $(FIRMWARE).elf: $(OBJS)
-	avr-gcc -DF_CPU=$(F_CPU) -mmcu=$(MCU) -o $@ $<
+	$(CC) -DF_CPU=$(F_CPU) -mmcu=$(MCU) -o $@ $<
 	
 %.o: %.c
-	avr-gcc -Os -DF_CPU=$(F_CPU) -mmcu=$(MCU) -c -o $@ $<
+	$(CC) -Os -DF_CPU=$(F_CPU) -mmcu=$(MCU) -c -o $@ $<
 	
 	
 clean:
