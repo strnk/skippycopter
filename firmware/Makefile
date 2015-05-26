@@ -1,8 +1,13 @@
+## Remote console over bluetooth
+DBG_BT_ADDR=00:12:09:28:04:27
+DBG_PIN=1234
+DBG_BAUDRATE=9600
+DBG_BT_DEV=rfcomm0
+
 ## OpenOCD scripts
 SCRIPTS_DIR=openocd
+S_INIT=$(SCRIPTS_DIR)/init.cfg
 S_SYSTEM=$(SCRIPTS_DIR)/skippycopter.cfg
-S_ERASE_ALL=$(SCRIPTS_DIR)/erase-all.cfg
-S_FLASH_ALL=$(SCRIPTS_DIR)/flash-all.cfg
 S_SHUTDOWN=$(SCRIPTS_DIR)/shutdown.cfg
 
 
@@ -12,22 +17,26 @@ BOARDS=powerboard motherboard
 firmware: $(BOARDS)
 
 # Powerboard
-powerboard: powerboard/powerboard.hex
-powerboard/powerboard.hex:
+powerboard:
 	make -C powerboard
 	
 # Motherboard
-motherboard: motherboard/motherboard.hex
-motherboard/motherboard.hex:
+motherboard:
 	make -C motherboard
 	
 
-## JTAG flash rules
-erase-all: firmware
-	openocd -f $(S_SYSTEM) -f $(S_ERASE_ALL) -f $(S_SHUTDOWN) 
+## JTAG flash rules	
+flash-%: %
+	openocd -f $(S_SYSTEM) -f $(SCRIPTS_DIR)/$<.cfg -f $(S_INIT) -f $(SCRIPTS_DIR)/flash-$<.cfg -f $(S_SHUTDOWN) 
 	
-flash-all: firmware
-	openocd -f $(S_SYSTEM) -f $(S_ERASE_ALL) -f $(S_FLASH_ALL) -f $(S_SHUTDOWN) 
+debug-%: %
+	openocd -f $(S_SYSTEM) -f $(SCRIPTS_DIR)/$<.cfg -f $(S_INIT)
+
+# Need to be ran as root ATM
+console:
+	rfcomm bind $(DBG_BT_DEV) $(DBG_BT_ADDR) 1
+	minicom -D /dev/$(DBG_BT_DEV) -b $(DBG_BAUDRATE)
+	rfcomm release $(DBG_BT_DEV)
 	
 clean:
 	for board in $(BOARDS) ; do \
