@@ -10,7 +10,7 @@ OBJDUMP		:= $(PREFIX)-objdump
 FIRMWARE	 = motherboard
 
 LDSCRIPT	 = stm32f4.ld
-SRC			 = main.c
+SRC			 = main.c debug.c board_setup.c led.c imu.c i2c.c
 OBJS		 = $(SRC:.c=.o)
 
 OPENCM3_DIR	?= /usr/local/arm-none-eabi/

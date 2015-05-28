@@ -1,7 +1,7 @@
 ## Remote console over bluetooth
 DBG_BT_ADDR=00:12:09:28:04:27
 DBG_PIN=1234
-DBG_BAUDRATE=9600
+DBG_BAUDRATE=115200
 DBG_BT_DEV=rfcomm0
 
 ## OpenOCD scripts
@@ -15,7 +15,8 @@ S_SHUTDOWN=$(SCRIPTS_DIR)/shutdown.cfg
 BOARDS=powerboard motherboard
 
 firmware: $(BOARDS)
-
+.PHONY: $(BOARDS)
+	
 # Powerboard
 powerboard:
 	make -C powerboard
