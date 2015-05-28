@@ -381,8 +381,8 @@ UsedLibrary="/Users/huriaux/Developpement/Perso/skippycopter/schematics/common/e
 
 [Win_1]
 Type="Control Panel"
-Loc="111 23 1006 418"
-State=2
+Loc="0 23 1439 895"
+State=1
 Number=0
 
 [Desktop]
