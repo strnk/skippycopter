@@ -1,0 +1,6 @@
+#!/usr/bin/env python3
+
+import sys
+from skippymonitor.MainCLI import MainCLI
+
+MainCLI().run(sys.argv)

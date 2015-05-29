@@ -1,0 +1,2 @@
+*.py		# Python files are generated from UI/Resources
+!__init__.py
