@@ -3,6 +3,7 @@
 #include "debug.h"
 #include "led.h"
 #include "imu.h"
+#include "common.h"
 #include "config.h"
 
 int main(void)
@@ -17,43 +18,28 @@ int main(void)
 	/* Set two LEDs for wigwag effect when toggling. */
 	led_set(LED1);
 	
-	printf("Skippycopter v1.0\n");
+	printf("\n\nSkippycopter v1.0\n");
 
 
     {
-        uint8_t id;
-        id = adxl345_read(IMU_ADXL345_REG_DEVID);
+        printf("Checking IMU... ");
+        imu_check_t imuCheck = imu_check();
 
-        printf("ADXL345 ID reg: %x\n", id); 
+        if (imuCheck == IMU_CHECK_OK)
+            puts("OK");
+        else
+            puts("KO !!");
     }
 
-    {
-        uint8_t idA, idB, idC;
-        idA = hmc5883l_read(IMU_HMC5883L_REG_IDA);
-        idB = hmc5883l_read(IMU_HMC5883L_REG_IDB);
-        idC = hmc5883l_read(IMU_HMC5883L_REG_IDC);
-
-        printf("HMC5883L ID regs: %x %x %x\n", idA, idB, idC);
-    }
-
-    {
-        uint16_t ac1;
-        ac1 = bmp085_read(IMU_BMP085_REG_AC1);
-
-        printf("BMP085 AC1 reg: %x\n", ac1); 
-    }
-
-    {
-        uint8_t id, temperature;
-        id = l3g4200d_read(IMU_L3G4200D_REG_WHO_AM_I);
-        temperature = l3g4200d_read(IMU_L3G4200D_REG_OUT_TEMP);
-
-        printf("L3G4200D WHOAMI reg: %x\n", id); 
-        printf("L3G4200D OUT_TEMP reg: %x\n", temperature); 
-    }
+    imu_init();
 
 	/* Blink the LEDs (PD12, PD13, PD14 and PD15) on the board. */
 	while (1) {
+        data3 compass;
+        hmc5883l_read_data(&compass);
+
+        printf("Compass: %d %d %d\n", compass.x, compass.y, compass.z);
+
 		/* Toggle LEDs. */
 		led_toggle(LED1 | LED2);
 		//printf(".\n");
