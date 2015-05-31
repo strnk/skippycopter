@@ -3,3 +3,5 @@
 *.hex
 *.d
 *.map
+*.bin
+

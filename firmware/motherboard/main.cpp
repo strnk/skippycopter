@@ -1,19 +1,23 @@
 #include <stdio.h>
+#include <imu/imu.h>
 #include "board_setup.h"
 #include "debug.h"
 #include "led.h"
-#include "imu.h"
 #include "common.h"
 #include "config.h"
 
-int main(void)
+IMU imu(I2C_SENSOR, RCC_I2C_SENSOR);
+
+extern "C" 
+int 
+main(void)
 {
 	int i;
 
 	clock_setup();
 	gpio_setup();
 	debug_setup();
-    imu_setup();
+	imu.setup();
 
 	/* Set two LEDs for wigwag effect when toggling. */
 	led_set(LED1);
@@ -23,7 +27,7 @@ int main(void)
 
     {
         printf("Checking IMU... ");
-        imu_check_t imuCheck = imu_check();
+        imu_check_t imuCheck = imu.check();
 
         if (imuCheck == IMU_CHECK_OK)
             puts("OK");
@@ -31,12 +35,12 @@ int main(void)
             puts("KO !!");
     }
 
-    imu_init();
+    imu.init();
 
 	/* Blink the LEDs (PD12, PD13, PD14 and PD15) on the board. */
 	while (1) {
         data3 compass;
-        hmc5883l_read_data(&compass);
+        imu.hmc5883l.read_data(&compass);
 
         printf("Compass: %d %d %d\n", compass.x, compass.y, compass.z);
 

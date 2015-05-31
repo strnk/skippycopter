@@ -10,8 +10,10 @@ OBJDUMP		:= $(PREFIX)-objdump
 FIRMWARE	 = motherboard
 
 LDSCRIPT	 = stm32f4.ld
-SRC			 = main.c debug.c board_setup.c led.c imu.c i2c.c
-OBJS		 = $(SRC:.c=.o)
+SRC			 = sys/cppheap.cpp debug.c board_setup.c led.c periph/i2c_device.cpp \
+	imu/hmc5883l.cpp imu/adxl345.cpp imu/bmp085.cpp imu/l3g4200d.cpp imu/imu.cpp main.c
+
+OBJS		 = $(patsubst %.cpp,%.o,$(patsubst %.c,%.o, $(SRC)))
 
 OPENCM3_DIR	?= /usr/local/arm-none-eabi/
 INCLUDE_DIR	= $(OPENCM3_DIR)/include
@@ -25,7 +27,7 @@ ARCH_FLAGS	 = -mthumb -mcpu=cortex-m4 $(FP_FLAGS)
 # C flags
 
 CFLAGS		+= -Os -g
-CFLAGS		+= -Wextra -Wshadow -Wimplicit-function-declaration
+CFLAGS		+= -Wextra -Wimplicit-function-declaration
 CFLAGS		+= -Wredundant-decls -Wmissing-prototypes -Wstrict-prototypes
 CFLAGS		+= -fno-common -ffunction-sections -fdata-sections
 
@@ -33,23 +35,26 @@ CFLAGS		+= -fno-common -ffunction-sections -fdata-sections
 # C++ flags
 
 CXXFLAGS	+= -Os -g
-CXXFLAGS	+= -Wextra -Wshadow -Wredundant-decls  -Weffc++
+CXXFLAGS	+= -Wextra -Wredundant-decls  -Weffc++
 CXXFLAGS	+= -fno-common -ffunction-sections -fdata-sections
+CXXFLAGS	+= -ffreestanding -nostdlib
+CXXFLAGS	+= -fno-rtti -nostartfiles -fno-exceptions -fno-unwind-tables -fno-stack-protector 
+CXXFLAGS	+= -std=c++0x -fno-builtin
 
 ###############################################################################
 # C & C++ preprocessor common flags
 
 CPPFLAGS	+= -MD
-CPPFLAGS	+= -Wall -Wundef
-CPPFLAGS	+= -I$(INCLUDE_DIR) -DSTM32F4
+CPPFLAGS	+= -Wall -Wundef 
+CPPFLAGS	+= -I$(INCLUDE_DIR) -I. -DSTM32F4
 
 ###############################################################################
 # Linker flags
 
-LDFLAGS		+= --static -nostartfiles
+LDFLAGS		+= --static -nostartfiles -fno-rtti -nostartfiles -fno-exceptions -fno-unwind-tables -fno-stack-protector 
 LDFLAGS		+= -L$(LIB_DIR)
 LDFLAGS		+= -T$(LDSCRIPT)
-LDFLAGS		+= -Wl,-Map=$(*).map
+LDFLAGS		+= -Wl,-Map=$(FIRMWARE).map
 LDFLAGS		+= -Wl,--gc-sections
 ifeq ($(V),99)
 LDFLAGS		+= -Wl,--print-gc-sections
@@ -63,6 +68,8 @@ LDLIBS		+= -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group
 
 all: $(FIRMWARE) hex
 
+test:
+	echo $(OBJS)
 #
 # HEX creation
 #
@@ -84,22 +91,20 @@ $(FIRMWARE).hex: $(FIRMWARE).elf
 
 
 $(FIRMWARE): $(FIRMWARE).elf
-%.elf %.map: $(OBJS) $(LDSCRIPT) $(LIB_DIR)/libopencm3_stm32f4.a
-	$(LD) $(LDFLAGS) $(ARCH_FLAGS) $(OBJS) $(LDLIBS) -o $(*).elf
+$(FIRMWARE).elf $(FIRMWARE).map: $(OBJS) $(LDSCRIPT) $(LIB_DIR)/libopencm3_stm32f4.a
+	$(LD) $(LDFLAGS) $(ARCH_FLAGS) $(OBJS) $(LDLIBS) -o $(FIRMWARE).elf
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(ARCH_FLAGS) -o $(*).o -c $(*).c
-
-%.o: %.cxx
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(ARCH_FLAGS) -o $(*).o -c $(*).cxx
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(ARCH_FLAGS) -o $(*).o -c $(*).cpp
 	
 clean:
-	rm -f *.o
+	find . -name '*.o' -delete
+	find . -name '*.d' -delete
 	
 distclean: clean
-	rm -f $(FIRMWARE).elf $(FIRMWARE).hex
+	rm -f $(FIRMWARE).elf $(FIRMWARE).hex $(FIRMWARE).map
 	
 	
