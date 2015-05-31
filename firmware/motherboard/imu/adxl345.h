@@ -2,6 +2,7 @@
 #define IMU_ADXL345_H
 
 #include <imu/imu_device.h>
+#include <common.h>
 
 // ADXL345 accelerometer
 #define ADXL345_ADDR 				0x53
@@ -40,6 +41,8 @@ public:
 
 	void init(void);
 	bool check(void);
+
+	void read_data(data3* data);
 };
 
 #endif // IMU_ADXL345_H

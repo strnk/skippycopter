@@ -25,9 +25,6 @@ I2C_Device::write(uint8_t reg, size_t size, void* data)
 	i2c_send_data(i2c, reg);
 	while (!(I2C_SR1(i2c) & I2C_SR1_TxE));
 
-	if (size == 1)
-		i2c_send_stop(i2c);
-
 	for (i = 0; i < size; i++) {
 		i2c_send_data(i2c, ((uint8_t*)data)[i]);
 		while (!(I2C_SR1(i2c) & I2C_SR1_TxE));

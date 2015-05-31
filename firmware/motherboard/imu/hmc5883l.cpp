@@ -1,4 +1,5 @@
 #include <imu/hmc5883l.h>
+#include <stdio.h>
 
 HMC5883L::HMC5883L(uint32_t i2c)
 	: IMU_Device(i2c, HMC5883L_ADDR)

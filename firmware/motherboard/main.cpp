@@ -39,10 +39,12 @@ main(void)
 
 	/* Blink the LEDs (PD12, PD13, PD14 and PD15) on the board. */
 	while (1) {
-        data3 compass;
+        data3 compass, accel;
         imu.hmc5883l.read_data(&compass);
+        imu.adxl345.read_data(&accel);
 
         printf("Compass: %d %d %d\n", compass.x, compass.y, compass.z);
+        printf("Accel  : %d %d %d\n", accel.x, accel.y, accel.z);
 
 		/* Toggle LEDs. */
 		led_toggle(LED1 | LED2);

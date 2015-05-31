@@ -14,7 +14,7 @@ IMU::setup(void)
 	i2c_set_dutycycle(i2c, I2C_CCR_DUTY_16_DIV_9);
 
 	// For APB1 PCLK1 = 42MHz => I2C speed = 400kHz
-	i2c_set_ccr(i2c, 3);
+	i2c_set_ccr(i2c, 15);
 
 	i2c_peripheral_enable(i2c);
 }
