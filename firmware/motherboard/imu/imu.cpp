@@ -1,5 +1,7 @@
 #include <libopencm3/stm32/i2c.h>
+#include <libopencm3/stm32/gpio.h>
 #include <imu/imu.h>
+#include <stdio.h>
 
 void
 IMU::setup(void)
@@ -14,7 +16,7 @@ IMU::setup(void)
 	i2c_set_dutycycle(i2c, I2C_CCR_DUTY_16_DIV_9);
 
 	// For APB1 PCLK1 = 42MHz => I2C speed = 400kHz
-	i2c_set_ccr(i2c, 15);
+	i2c_set_ccr(i2c, 3);
 
 	i2c_peripheral_enable(i2c);
 }
@@ -32,6 +34,12 @@ imu_check_t
 IMU::check(void)
 {
 	imu_check_t check = IMU_CHECK_OK;
+
+    gpio_mode_setup(GPIOB, GPIO_MODE_INPUT, GPIO_PUPD_NONE, GPIO6 | GPIO7);
+    if (!gpio_get(GPIOB, GPIO6) || !gpio_get(GPIOB, GPIO7)) {
+    	printf("I2CERR");
+    }
+    gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO6 | GPIO7);
 
 	if (!adxl345.check())
 		check |= IMU_CHECK_ADXL345_FAIL;

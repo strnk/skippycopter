@@ -1,8 +1,8 @@
+#include <periph/sys_scheduler.h>
 #include <imu/adxl345.h>
-#include <stdio.h>
 
 ADXL345::ADXL345(uint32_t i2c)
-	: IMU_Device(i2c, ADXL345_ADDR)
+	: IMU_Device(i2c, ADXL345_ADDR), task(0), ready(false), accelero({0, 0, 0})
 {
 }
 
@@ -37,6 +37,8 @@ ADXL345::init(void)
 
 	// Bypass mode (no FIFO)
 	write(ADXL345_REG_FIFO_CTL, 0x00);
+
+    task = SystemScheduler.registerTask(SYS_SCHEDULER_MS(1), ADXL345::update_tick_handler, (uint32_t*)(this));
 }
 
 bool 
@@ -51,13 +53,14 @@ ADXL345::check(void)
 }
 
 void
-ADXL345::read_data(data3* data)
+ADXL345::update(void)
 {
 	uint8_t raw[6];
 
 	read(ADXL345_REG_DATAX, 6, raw);
 
-	data->x = (raw[1]<<8) | raw[0];
-	data->z = (raw[3]<<8) | raw[2];
-	data->y = (raw[5]<<8) | raw[4];
+	accelero.x = (raw[1]<<8) | raw[0];
+	accelero.y = (raw[3]<<8) | raw[2];
+	accelero.z = (raw[5]<<8) | raw[4];
+	ready = true;
 }

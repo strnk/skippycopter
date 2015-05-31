@@ -1,8 +1,8 @@
+#include <periph/sys_scheduler.h>
 #include <imu/hmc5883l.h>
-#include <stdio.h>
 
 HMC5883L::HMC5883L(uint32_t i2c)
-	: IMU_Device(i2c, HMC5883L_ADDR)
+	: IMU_Device(i2c, HMC5883L_ADDR), task(0), ready(false), magneto({0, 0, 0})
 {
 
 }
@@ -20,6 +20,8 @@ HMC5883L::init(void)
 
 	// MD1:0 = 00	=> Continous measurement mode
 	write(HMC5883L_REG_MR, 0x00);
+
+    task = SystemScheduler.registerTask(SYS_SCHEDULER_MS(10), HMC5883L::update_tick_handler, (uint32_t*)(this));
 }
 
 bool 
@@ -37,13 +39,14 @@ HMC5883L::check(void)
 }
 
 void
-HMC5883L::read_data(data3* data)
+HMC5883L::update(void)
 {
 	uint8_t raw[6];
 
 	read(HMC5883L_REG_DX, 6, raw);
 
-	data->x = (raw[0]<<8) | raw[1];
-	data->z = (raw[2]<<8) | raw[3];
-	data->y = (raw[4]<<8) | raw[5];
+	magneto.x = (raw[0]<<8) | raw[1];
+	magneto.z = (raw[2]<<8) | raw[3];
+	magneto.y = (raw[4]<<8) | raw[5];
+	ready = true;
 }

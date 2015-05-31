@@ -15,7 +15,7 @@ void gpio_setup(void)
     rcc_periph_clock_enable(RCC_GPIOA);
     rcc_periph_clock_enable(RCC_GPIOB);
     rcc_periph_clock_enable(RCC_GPIOC);
-			
+			 
     /* PA0/1/2/3 as TIM2 CH1/2/3/4 */
     gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO0 | GPIO1 | GPIO2 | GPIO3);
     gpio_set_af(GPIOA, GPIO_AF1, GPIO0 | GPIO1 | GPIO2 | GPIO3);

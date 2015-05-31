@@ -37,12 +37,17 @@
 class ADXL345 : public IMU_Device
 {
 public:
+	uint8_t task;
+	bool ready;
+	data3 accelero;
+
 	ADXL345(uint32_t i2c);
 
 	void init(void);
 	bool check(void);
 
-	void read_data(data3* data);
+	void update(void);
+	static void update_tick_handler(uint32_t* data) { ((ADXL345*)data)->update(); }
 };
 
 #endif // IMU_ADXL345_H

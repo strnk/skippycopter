@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <imu/imu.h>
+#include <periph/sys_scheduler.h>
 #include "board_setup.h"
 #include "debug.h"
 #include "led.h"
@@ -8,13 +9,33 @@
 
 IMU imu(I2C_SENSOR, RCC_I2C_SENSOR);
 
+data3 magneto, accelero, gyro;
+int32_t pressure, temperature;
+uint32_t main_loop_performance;
+
+void toggle(uint32_t* data) {
+	/* Toggle LEDs. */
+	led_toggle(LED1 | LED2);
+}
+
+void display_data(uint32_t* data) {
+	printf("Magneto : %d %d %d\n", magneto.x, magneto.y, magneto.z);
+	printf("Accelero: %d %d %d\n", accelero.x, accelero.y, accelero.z);
+	printf("Gyro    : %d %d %d\n", gyro.x, gyro.y, gyro.z);
+	printf("Pressure: %ld\n", pressure);
+	printf("Temp    : %ld\n", temperature);
+	printf("Perf    : %lu\n", main_loop_performance);
+
+	main_loop_performance = 0;
+}
+
 extern "C" 
 int 
 main(void)
 {
-	int i;
-
 	clock_setup();
+	SystemScheduler.init();
+
 	gpio_setup();
 	debug_setup();
 	imu.setup();
@@ -37,21 +58,35 @@ main(void)
 
     imu.init();
 
-	/* Blink the LEDs (PD12, PD13, PD14 and PD15) on the board. */
+    SystemScheduler.registerTask(SYS_SCHEDULER_S(1), toggle);
+    SystemScheduler.registerTask(SYS_SCHEDULER_S(1), display_data);
+
+	/* Event loop */
 	while (1) {
-        data3 compass, accel;
-        imu.hmc5883l.read_data(&compass);
-        imu.adxl345.read_data(&accel);
+        if (SystemScheduler.pending)
+        	SystemScheduler.trigger();
 
-        printf("Compass: %d %d %d\n", compass.x, compass.y, compass.z);
-        printf("Accel  : %d %d %d\n", accel.x, accel.y, accel.z);
+        if (imu.hmc5883l.ready) {
+        	imu.hmc5883l.ready = false;
+        	magneto = imu.hmc5883l.magneto;
+        }
 
-		/* Toggle LEDs. */
-		led_toggle(LED1 | LED2);
-		//printf(".\n");
-		for (i = 0; i < 6000000; i++) { /* Wait a bit. */
-			__asm__("nop");
-		}
+        if (imu.adxl345.ready) {
+        	imu.adxl345.ready = false;
+        	accelero = imu.adxl345.accelero;
+        }
+
+        if (imu.l3g4200d.ready) {
+        	imu.l3g4200d.ready = false;
+        	gyro = imu.l3g4200d.gyro;
+        }
+
+        if (imu.bmp085.ready) {
+        	imu.bmp085.ready = false;
+        	pressure = imu.bmp085.pressure;
+        	temperature = imu.bmp085.temperature;
+        }
+        main_loop_performance++;
 	}
 
 	return 0;

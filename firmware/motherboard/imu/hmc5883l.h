@@ -20,12 +20,17 @@
 class HMC5883L : public IMU_Device
 {
 public:
+	uint8_t task;
+	bool ready;
+	data3 magneto;
+
 	HMC5883L(uint32_t i2c);
 
 	void init(void);
 	bool check(void);
 
-	void read_data(data3* data);
+	void update(void);
+	static void update_tick_handler(uint32_t* data) { ((HMC5883L*)data)->update(); }
 };
 
 #endif // IMU_HMC5883L_H
