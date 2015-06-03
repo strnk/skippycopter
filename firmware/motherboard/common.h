@@ -17,4 +17,19 @@ typedef struct
 	uint16_t z;
 } data3u;
 
+
+typedef struct
+{
+	int32_t x;
+	int32_t y;
+	int32_t z;
+} data3l;
+
+typedef struct
+{
+	uint32_t x;
+	uint32_t y;
+	uint32_t z;
+} data3ul;
+
 #endif // COMMON_H

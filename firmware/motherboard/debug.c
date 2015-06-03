@@ -14,7 +14,7 @@ debug_setup(void)
     rcc_periph_clock_enable(RCC_UART_DEBUG);
 
 	/* Setup UART parameters. */
-	usart_set_baudrate(UART_DEBUG, 9600);
+	usart_set_baudrate(UART_DEBUG, 115200);
 	usart_set_databits(UART_DEBUG, 8);
 	usart_set_stopbits(UART_DEBUG, USART_STOPBITS_1);
 	usart_set_mode(UART_DEBUG, USART_MODE_TX);
