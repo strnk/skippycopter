@@ -7,6 +7,7 @@ Required depencies to build the software:
 - PyQt 5 (>=5.4.1)
 - SIP (>=4.16.7)
 - PyInstaller (python3 branch)
+- matplotlib (>=1.4)
 
 ## Qt 5
 
