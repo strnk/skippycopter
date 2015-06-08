@@ -34,7 +34,6 @@ public:
 	void init(void);
 	bool check(void);
 
-	void read_byte_by_byte(uint8_t reg, size_t size, void* ptr);
 	void update(void);
 	static void update_tick_handler(uint32_t* data) { ((L3G4200D*)data)->update(); }
 };

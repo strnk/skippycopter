@@ -7,7 +7,7 @@
 
 class I2C_Device
 {
-private:
+protected:
 	uint32_t i2c;
 	uint8_t address;
 

@@ -11,16 +11,16 @@ void
 L3G4200D::init(void)
 {
 	// 800Hz, LPF 110Hz, X, Y and Z enabled
-	write(L3G4200D_REG_CTRL1, 0xCF);
+	write(L3G4200D_REG_CTRL1, 0xFF);
 
 	// HPF normal mode, 0.1Hz
-	write(L3G4200D_REG_CTRL2, 0x19);
+	write(L3G4200D_REG_CTRL2, 0x09);
 
 	// Disable interrupts
 	write(L3G4200D_REG_CTRL3, 0x00);
 
 	// Continuous update, big endian, full scale 2000dps
-	write(L3G4200D_REG_CTRL4, 0x30);
+	write(L3G4200D_REG_CTRL4, 0xB0);
 
 	// No FIFO, output not HPF
 	write(L3G4200D_REG_CTRL5, 0x00);
@@ -43,27 +43,13 @@ L3G4200D::check(void)
 }
 
 void
-
-L3G4200D::read_byte_by_byte(uint8_t reg, size_t size, void* data) 
-{
-	unsigned int i;
-	uint8_t* ptr = (uint8_t*)data;
-
-	for (i = 0; i < size; i++, ptr += 1)
-		read(reg+i, 1, ptr);
-}
-
-void
 L3G4200D::update(void)
 {
 	uint8_t raw[6];
-
-	read_byte_by_byte(L3G4200D_REG_OUT_X, 2, &raw[0]);
-	read_byte_by_byte(L3G4200D_REG_OUT_Z, 2, &raw[2]);
-	read_byte_by_byte(L3G4200D_REG_OUT_Y, 2, &raw[4]);
+	read(L3G4200D_REG_OUT_X | 0x80, 6, raw);
 
 	gyro.x = (raw[1]<<8) | raw[0];
-	gyro.z = (raw[3]<<8) | raw[2];
-	gyro.y = (raw[5]<<8) | raw[4];
+	gyro.y = (raw[3]<<8) | raw[2];
+	gyro.z = (raw[5]<<8) | raw[4];
 	ready = true;
 }
