@@ -45,9 +45,9 @@ class M3A3G3PTL:
 		self.mag.z = self.mag.z * 0.92
 
 		# Accelerometer in G (0.04mG/LSB)
-		self.accel.x = self.accel.x * 0.04
-		self.accel.y = self.accel.y * 0.04
-		self.accel.z = self.accel.z * 0.04
+		self.accel.x = self.accel.x * 0.008
+		self.accel.y = self.accel.y * 0.008
+		self.accel.z = self.accel.z * 0.008
 
 		# Gyroscope in deg/sec (70mdps/LSB => 0.07 deg/sec)
 		self.gyro.x = self.gyro.x * 0.07

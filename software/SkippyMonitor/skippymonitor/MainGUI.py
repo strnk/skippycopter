@@ -1,14 +1,18 @@
 from skippymonitor.ui import AboutUI, MainUI
 from skippymonitor.uart import direct, bluetooth, thread
-from skippymonitor.PlotWindow import PlotWindow
+from skippymonitor.imu_debug import PlotWindow
+from skippymonitor.attitude import AttitudeWindow
 from skippymonitor.uart.interpreters import *
+from skippymonitor.calibration import IMUCalibration
 
 from optparse import OptionParser
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
+from PyQt5.QtWidgets import QProgressDialog, QMessageBox
 
 import sys
+import time
 
 class AboutDialog(QtWidgets.QDialog, AboutUI.Ui_Dialog):
     def __init__(self, parent=None):
@@ -17,12 +21,16 @@ class AboutDialog(QtWidgets.QDialog, AboutUI.Ui_Dialog):
 
 class MainWindow(QtWidgets.QMainWindow, MainUI.Ui_MainWindow):
     IMUWindow = None
+    AttitudeWindow = None
+    calibration = None
     bRedirectData = False
 
-    def __init__(self, interpreterClass, parent=None):
+    def __init__(self, linkType, interpreterClass, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
         self.Interpreter = interpreterClass
+        self.linkType = linkType
+        self.statusBar.showMessage("Connected on " + linkType)
 
     @pyqtSlot(bool)
     def on_actionAbout_triggered(self, checked):
@@ -42,6 +50,47 @@ class MainWindow(QtWidgets.QMainWindow, MainUI.Ui_MainWindow):
         self.bRedirectData = False
         self.IMUWindow = None
 
+    @pyqtSlot(bool)
+    def on_action3D_Attitude_triggered(self, checked):
+        self.AttitudeWindow = AttitudeWindow(self.Interpreter, self)
+        self.AttitudeWindow.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        self.AttitudeWindow.destroyed.connect(self.on_attitudeWindow_closed)
+        self.bRedirectData = True
+        self.AttitudeWindow.show()
+
+    def on_attitudeWindow_closed(self):
+        self.bRedirectData = False
+        self.AttitudeWindow = None
+
+    @pyqtSlot(bool)
+    def on_actionCalibrate_triggered(self, checked):
+        reply = QMessageBox.information(self, "IMU calibration",
+            "The IMU will be calibrated. The board must stay flat and stable during the operations", 
+            QMessageBox.Ok | QMessageBox.Cancel, QMessageBox.Cancel)
+
+        if reply == QMessageBox.Cancel:
+            return
+
+        self.calibration = IMUCalibration(self.Interpreter, self)
+        self.calibration.calibrationEnd.connect(self.on_calibration_end)
+        self.calibration.calibrationCanceled.connect(self.on_calibration_canceled)
+        self.bRedirectData = True
+        self.calibration.start()
+
+    def on_calibration_canceled(self):
+        print("Calibration canceled")
+        self.calibration = None
+        self.bRedirectData = False
+
+    def on_calibration_end(self):
+        print("End of calibration:")
+        print("  Gyro:")
+        print("    X: offset={offset}, noise={noise}".format(offset=self.calibration.gyro.x.mean, noise=self.calibration.gyro.x.noise))
+        print("    Y: offset={offset}, noise={noise}".format(offset=self.calibration.gyro.y.mean, noise=self.calibration.gyro.y.noise))
+        print("    Z: offset={offset}, noise={noise}".format(offset=self.calibration.gyro.z.mean, noise=self.calibration.gyro.z.noise))
+        self.calibration = None
+        self.bRedirectData = False
+
     def addLine(self, string):
         if not self.bRedirectData:
             newText = self.plainTextEdit.toPlainText() + string
@@ -51,6 +100,10 @@ class MainWindow(QtWidgets.QMainWindow, MainUI.Ui_MainWindow):
         else:
             if self.IMUWindow != None:
                 self.IMUWindow.newData(string)
+            if self.AttitudeWindow != None:
+                self.AttitudeWindow.newData(string)
+            if self.calibration != None:
+                self.calibration.newData(string)
 
 
 class MainGUI:
@@ -85,17 +138,26 @@ class MainGUI:
     def run(self):
         if self.options.bluetoothMacAddr != None:
             self.Serial = bluetooth.BluetoothSerial(self.options.bluetoothMacAddr, int(self.options.bluetoothChannel))
+            linkType = "bluetooth device {device}, CH{channel}".format(device=self.options.bluetoothMacAddr, channel=self.options.bluetoothChannel)
         elif self.options.serialDev != None:
             self.Serial = direct.DirectSerial(self.options.serialDev, int(self.options.serialSpeed))
+            linkType = "serial device {device} at {speed} bps".format(device=self.options.serialDev, speed=self.options.serialSpeed)
         else:
             print("Bluetooth link or serial device must be specified")
             return
 
         self.Interpreter = eval(self.options.imuDataInterpreterClass)
-        self.Serial.open()
 
         app = QtWidgets.QApplication(sys.argv)
-        main = MainWindow(self.Interpreter)
+        main = MainWindow(linkType, self.Interpreter)
+
+        try:
+            self.Serial.open()
+        except OSError:
+            QMessageBox.critical(main, "SkippyMonitor",
+                "Unable to open " + linkType, QMessageBox.Close, QMessageBox.Close)
+            return
+
         main.show()
 
         self.SerialThread = thread.QtReader(self.Serial)
