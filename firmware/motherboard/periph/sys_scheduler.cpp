@@ -25,7 +25,7 @@ Sys_Scheduler::init(void)
 uint8_t
 Sys_Scheduler::registerTask(uint32_t reload, sys_taskptr_t ptr, uint32_t* data, uint8_t ctrl)
 {
-	printf("SCHED :: REG T%d, R=%d, ptr=%p", task_count, reload, ptr);
+	printf("SCHED :: REG T%d, R=%ld, ptr=%p\n", task_count, reload, ptr);
 	tasks[task_count].ctrl = ctrl;
 	tasks[task_count].counter = reload;
 	tasks[task_count].reload = reload;
