@@ -18,6 +18,7 @@ void gpio_setup(void)
 			 
     /* PA0/1/2/3 as TIM2 CH1/2/3/4 */
     gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO0 | GPIO1 | GPIO2 | GPIO3);
+    gpio_set_output_options(GPIOA, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, GPIO0 | GPIO1 | GPIO2 | GPIO3);
     gpio_set_af(GPIOA, GPIO_AF1, GPIO0 | GPIO1 | GPIO2 | GPIO3);
 
     /* PA8 as I2C3 SCL */
@@ -61,4 +62,8 @@ void gpio_setup(void)
     /* PC10/11 as UART4 TX/RX */
     gpio_mode_setup(GPIOC, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO10 | GPIO11);
     gpio_set_af(GPIOC, GPIO_AF8, GPIO10 | GPIO11);
+
+    // Enable timers clocks
+    rcc_periph_clock_enable(RCC_PWM_LO_TIMER);
+    rcc_periph_clock_enable(RCC_PWM_HI_TIMER);
 }
