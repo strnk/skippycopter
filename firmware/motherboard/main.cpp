@@ -3,14 +3,15 @@
 #include <periph/sys_scheduler.h>
 #include <debug/performance.h>
 #include <periph/pwm.h>
+#include <cli/cli.h>
 #include "board_setup.h"
-#include "debug.h"
 #include "led.h"
 #include "common.h"
 #include "config.h"
 
 IMU imu(I2C_SENSOR, RCC_I2C_SENSOR);
 PWM pwm_lo(PWM_LO_TIMER, 1060, 1860);
+PWM pwm_hi(PWM_HI_TIMER, 1060, 1860);
 
 uint8_t data_received;
 data3 magneto, accelero, gyro;
@@ -53,7 +54,7 @@ main(void)
 	SystemScheduler.init();
 
 	gpio_setup();
-	debug_setup();
+	CLIHandler.init();
 	imu.setup();
 
 	/* Set two LEDs for wigwag effect when toggling. */
@@ -87,8 +88,11 @@ main(void)
     pwm_lo.set_pulse_width(PWM4_CHANNEL, 1060);
 
     SystemScheduler.registerTask(SYS_SCHEDULER_S(1), toggle);
-    SystemScheduler.registerTask(SYS_SCHEDULER_S(1), display_data);
+    //SystemScheduler.registerTask(SYS_SCHEDULER_S(1), display_data);
     data_received = 0x00;
+
+    // Display the prompt on the debug interface
+    CLIHandler.prompt();
 
 	/* Event loop */
 	while (1) {
@@ -96,6 +100,9 @@ main(void)
 
         if (SystemScheduler.pending)
         	SystemScheduler.trigger();
+
+        if (CLIHandler.pending)
+        	CLIHandler.trigger();
 
         if (imu.hmc5883l.ready) {
         	imu.hmc5883l.ready = false;

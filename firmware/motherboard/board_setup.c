@@ -66,4 +66,7 @@ void gpio_setup(void)
     // Enable timers clocks
     rcc_periph_clock_enable(RCC_PWM_LO_TIMER);
     rcc_periph_clock_enable(RCC_PWM_HI_TIMER);
+
+    // Enable UARTs clocks
+    rcc_periph_clock_enable(RCC_UART_DEBUG);
 }

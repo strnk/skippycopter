@@ -4,6 +4,7 @@
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/i2c.h>
 #include <libopencm3/stm32/rcc.h>
+#include <libopencm3/cm3/nvic.h>
 
 
 // GPS port
@@ -12,6 +13,8 @@
 
 // Debug port
 #define RCC_UART_DEBUG		RCC_USART3
+#define IRQ_UART_DEBUG		NVIC_USART3_IRQ
+#define usart_debug_isr		usart3_isr
 #define UART_DEBUG			USART3
 
 // Telemetry port
