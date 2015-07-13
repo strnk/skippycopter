@@ -10,9 +10,9 @@ GDB			:= $(PREFIX)-gdb
 
 FIRMWARE=powerboard
 MCU=atmega164p
-F_CPU=1000000
+F_CPU=8000000
 
-SRC=main.c
+SRC=adc.c i2c.c main.c
 OBJS=$(SRC:.c=.o)
 
 
@@ -32,7 +32,7 @@ $(FIRMWARE).hex: $(FIRMWARE).elf
 
 $(FIRMWARE): $(FIRMWARE).elf
 $(FIRMWARE).elf: $(OBJS)
-	$(CC) -DF_CPU=$(F_CPU) -mmcu=$(MCU) -o $@ $<
+	$(CC) -DF_CPU=$(F_CPU) -mmcu=$(MCU) -o $@ $^
 	
 %.o: %.c
 	$(CC) -Os -DF_CPU=$(F_CPU) -mmcu=$(MCU) -c -o $@ $<
