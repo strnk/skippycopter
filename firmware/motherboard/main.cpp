@@ -4,14 +4,17 @@
 #include <debug/performance.h>
 #include <periph/pwm.h>
 #include <cli/cli.h>
+#include <system/system.h>
 #include "board_setup.h"
 #include "led.h"
 #include "common.h"
 #include "config.h"
 
+System sys(I2C_SYSTEM, RCC_I2C_SYSTEM);
 IMU imu(I2C_SENSOR, RCC_I2C_SENSOR);
 PWM pwm_lo(PWM_LO_TIMER, 1060, 1860);
 PWM pwm_hi(PWM_HI_TIMER, 1060, 1860);
+
 
 uint8_t data_received;
 data3 magneto, accelero, gyro;
@@ -55,6 +58,7 @@ main(void)
 
 	gpio_setup();
 	CLIHandler.init();
+    sys.setup();
 	imu.setup();
 
 	/* Set two LEDs for wigwag effect when toggling. */
@@ -63,7 +67,19 @@ main(void)
 
 
     {
-        printf("Checking IMU... ");
+        printf("Checking system... \n");
+        sys_check_t sysCheck = sys.check();
+
+        if (sysCheck == SYS_CHECK_OK)
+            puts("OK");
+        else
+            puts("KO !!");
+    }
+
+    sys.init();
+
+    {
+        printf("Checking IMU... \n");
         imu_check_t imuCheck = imu.check();
 
         if (imuCheck == IMU_CHECK_OK)

@@ -7,6 +7,7 @@
 const cli_funcdesc_t cli_functions[] = {
 	// System functions
 	{ "ping",	0,	cli_func_system_ping },
+	{ "power",	0, 	cli_func_system_power },
 
 	// PWM functions
 	{ "pwmlo",	1,	cli_func_pwm_pwmlo },
