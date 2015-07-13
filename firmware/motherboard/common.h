@@ -32,4 +32,25 @@ typedef struct
 	uint32_t z;
 } data3ul;
 
+typedef struct
+{
+	float x;
+	float y;
+	float z;
+} data3f;
+
+typedef struct {
+	float yaw;
+	float pitch;
+	float roll;
+} orientation_t;
+
+typedef struct {
+	float q0;
+	float q1;
+	float q2;
+	float q3;
+} quaternion_t;
+
+
 #endif // COMMON_H

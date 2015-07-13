@@ -10,8 +10,8 @@ OBJDUMP		:= $(PREFIX)-objdump
 FIRMWARE	 = motherboard
 
 LDSCRIPT	 = stm32f4.ld
-SRC			 = sys/cppheap.cpp periph/sys_scheduler.cpp board_setup.c led.c periph/i2c_device.cpp \
-	periph/pwm.cpp imu/hmc5883l.cpp imu/adxl345.cpp imu/bmp085.cpp imu/l3g4200d.cpp imu/imu.cpp \
+SRC			 = sys/cppheap.cpp sys/flags.c periph/sys_scheduler.cpp board_setup.c led.c periph/i2c_device.cpp \
+	periph/pwm.cpp imu/fusion/madgwick.cpp imu/hmc5883l.cpp imu/adxl345.cpp imu/bmp085.cpp imu/l3g4200d.cpp imu/imu.cpp \
 	cli/functions/system.cpp cli/functions/pwm.cpp cli/cli_functions.c cli/cli.cpp \
 	system/powerboard.cpp system/system.cpp \
 	main.c
@@ -71,7 +71,7 @@ endif
 # Used libraries
 
 LDLIBS		+= -lopencm3_stm32f4
-LDLIBS		+= -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group
+LDLIBS		+= -Wl,--start-group -lm -lc -lgcc -lnosys -Wl,--end-group
 
 all: $(FIRMWARE) hex
 

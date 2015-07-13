@@ -5,6 +5,7 @@
 #include <periph/pwm.h>
 #include <cli/cli.h>
 #include <system/system.h>
+#include <sys/flags.h>
 #include "board_setup.h"
 #include "led.h"
 #include "common.h"
@@ -15,11 +16,6 @@ IMU imu(I2C_SENSOR, RCC_I2C_SENSOR);
 PWM pwm_lo(PWM_LO_TIMER, 1060, 1860);
 PWM pwm_hi(PWM_HI_TIMER, 1060, 1860);
 
-
-uint8_t data_received;
-data3 magneto, accelero, gyro;
-int32_t pressure, temperature;
-
 void toggle(uint32_t* data) {
 	/* Toggle LEDs. */
 	led_toggle(LED1 | LED2);
@@ -27,26 +23,33 @@ void toggle(uint32_t* data) {
 }
 
 void display_data(uint32_t* data) {
-	
-	puts("");
-	// in mG (gauss)
-	printf("Magneto : %.2f %.2f %.2f\n", magneto.x*0.92, magneto.y*0.92, magneto.z*0.92);
+	if (cli_flags.data_reporting) {
+    	puts("");
+    	// in mG (gauss)
+    	printf("Magneto : %.2f %.2f %.2f\n", imu.magneto.x, imu.magneto.y, imu.magneto.z);
 
-	// in G (accel)
-	printf("Accelero: %.2f %.2f %.2f\n", accelero.x*0.008, accelero.y*0.008, accelero.z*0.008);
+    	// in G (accel)
+    	printf("Accelero: %.2f %.2f %.2f\n", imu.accelero.x, imu.accelero.y, imu.accelero.z);
 
-	// in degrees per sec
-	printf("Gyro    : %.2f %.2f %.2f\n", gyro.x*0.07, gyro.y*0.07, gyro.z*0.07);
+    	// in degrees per sec
+    	printf("Gyro    : %.2f %.2f %.2f\n", imu.gyro.x, imu.gyro.y, imu.gyro.z);
 
-	// in hPa
-	printf("Pressure: %.2f\n", pressure/100.0);
+    	// in hPa
+    	printf("Pressure: %.2f\n", imu.pressure);
 
-	// in °C
-	printf("Temp    : %.1f\n", temperature/10.0);
-	printf("Perf    : M:%lu ACC: %lu GYR: %lu MAG: %lu PRS: %lu\n", 
-		perf_counter_value(PERF_MAIN_LOOP), perf_counter_value(PERF_IMU_ACCEL),
-		perf_counter_value(PERF_IMU_GYRO), perf_counter_value(PERF_IMU_MAGN),
-		perf_counter_value(PERF_IMU_PRESS));
+    	// in °C
+    	printf("Temp    : %.1f\n", imu.temperature);
+    	printf("Perf    : M:%lu ACC: %lu GYR: %lu MAG: %lu PRS: %lu\n", 
+    		perf_counter_value(PERF_MAIN_LOOP), perf_counter_value(PERF_IMU_ACCEL),
+    		perf_counter_value(PERF_IMU_GYRO), perf_counter_value(PERF_IMU_MAGN),
+    		perf_counter_value(PERF_IMU_PRESS));
+    }
+
+    if (cli_flags.orientation_reporting) {
+        orientation_t orientation = imu.getOrientation();
+
+        printf("YAW: %03.2f  PITCH: %03.2f  ROLL: %03.2f\n", orientation.yaw, orientation.pitch, orientation.roll);
+    }
 }
 
 extern "C" 
@@ -56,6 +59,7 @@ main(void)
 	clock_setup();
 	SystemScheduler.init();
 
+    flags_setup();
 	gpio_setup();
 	CLIHandler.init();
     sys.setup();
@@ -104,8 +108,7 @@ main(void)
     pwm_lo.set_pulse_width(PWM4_CHANNEL, 1060);
 
     SystemScheduler.registerTask(SYS_SCHEDULER_S(1), toggle);
-    //SystemScheduler.registerTask(SYS_SCHEDULER_S(1), display_data);
-    data_received = 0x00;
+    SystemScheduler.registerTask(SYS_SCHEDULER_S(1), display_data);
 
     // Display the prompt on the debug interface
     CLIHandler.prompt();
@@ -120,33 +123,7 @@ main(void)
         if (CLIHandler.pending)
         	CLIHandler.trigger();
 
-        if (imu.hmc5883l.ready) {
-        	imu.hmc5883l.ready = false;
-        	magneto = imu.hmc5883l.magneto;
-        	data_received |= 0x04;
-        	perf_counter_inc(PERF_IMU_MAGN);
-        }
-
-        if (imu.adxl345.ready) {
-        	imu.adxl345.ready = false;
-        	accelero = imu.adxl345.accelero;
-        	data_received |= 0x01;
-        	perf_counter_inc(PERF_IMU_ACCEL);
-        }
-
-        if (imu.l3g4200d.ready) {
-        	imu.l3g4200d.ready = false;
-        	gyro = imu.l3g4200d.gyro;
-        	data_received |= 0x02;
-        	perf_counter_inc(PERF_IMU_GYRO);
-        }
-
-        if (imu.bmp085.ready) {
-        	imu.bmp085.ready = false;
-        	pressure = imu.bmp085.pressure;
-        	temperature = imu.bmp085.temperature;
-        	perf_counter_inc(PERF_IMU_PRESS);
-        }
+        imu.checkPending();
 
         /*
         if (data_received == 0x03) {
