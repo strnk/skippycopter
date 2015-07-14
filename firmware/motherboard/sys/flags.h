@@ -8,6 +8,7 @@ extern "C" {
 typedef struct {
 	int	data_reporting 	: 1;
 	int orientation_reporting : 1;
+	int raw_attitude : 1;
 } cli_flags_t;
 
 #ifndef IN_FLAGS_C

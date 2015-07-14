@@ -29,6 +29,8 @@ flag_set(char *name, uint8_t value)
 		cli_flags.data_reporting = value;
 	else if (!strcmp(name, "orientation_reporting"))
 		cli_flags.orientation_reporting = value;
+	else if (!strcmp(name, "raw_attitude"))
+		cli_flags.raw_attitude = value;
 	else
 		return 1;
 

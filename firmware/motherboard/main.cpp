@@ -52,6 +52,18 @@ void display_data(uint32_t* data) {
     }
 }
 
+void display_raw_data(uint32_t* data) {
+    orientation_t orientation;
+    uint32_t* yaw = (uint32_t*)(&orientation.yaw);
+    uint32_t* pitch = (uint32_t*)(&orientation.pitch); 
+    uint32_t* roll = (uint32_t*)(&orientation.roll);  
+    orientation = imu.getOrientation();
+
+    if (cli_flags.raw_attitude) {
+        printf("AT %04X %04X %04X\n", *yaw, *pitch, *roll);
+    }
+}
+
 extern "C" 
 int 
 main(void)
@@ -65,10 +77,12 @@ main(void)
     sys.setup();
 	imu.setup();
 
-	/* Set two LEDs for wigwag effect when toggling. */
 	led_set(LED1);
 	printf("\n\nSkippycopter v1.0\n");
 
+    // Wait for the powerboard to initialize
+    for (unsigned long i = 0; i < 42000000L; i++)
+        asm("nop");
 
     {
         printf("Checking system... \n");
@@ -109,6 +123,7 @@ main(void)
 
     SystemScheduler.registerTask(SYS_SCHEDULER_S(1), toggle);
     SystemScheduler.registerTask(SYS_SCHEDULER_S(1), display_data);
+    SystemScheduler.registerTask(SYS_SCHEDULER_MS(10), display_raw_data);
 
     // Display the prompt on the debug interface
     CLIHandler.prompt();
@@ -124,23 +139,6 @@ main(void)
         	CLIHandler.trigger();
 
         imu.checkPending();
-
-        /*
-        if (data_received == 0x03) {
-			printf("%04X %04X %04X %04X %04X %04X %04X %04X %04X %08X %04X %04X\n", 
-				0, 0, 0,
-				accelero.x&0xFFFF, accelero.y&0xFFFF, accelero.z&0xFFFF,
-				gyro.x&0xFFFF, gyro.y&0xFFFF, gyro.z&0xFFFF,
-				pressure, temperature&0xFFFF, perf_counter_value(PERF_MAIN_LOOP));
-        	data_received = 0x00;
-        } else if (data_received == 0x07) {
-			printf("%04X %04X %04X %04X %04X %04X %04X %04X %04X %08X %04X %04X\n", 
-				magneto.x&0xFFFF, magneto.y&0xFFFF, magneto.z&0xFFFF,
-				accelero.x&0xFFFF, accelero.y&0xFFFF, accelero.z&0xFFFF,
-				gyro.x&0xFFFF, gyro.y&0xFFFF, gyro.z&0xFFFF,
-				pressure, temperature&0xFFFF, perf_counter_value(PERF_MAIN_LOOP));
-        	data_received = 0x00;
-        }*/
 	}
 
 	return 0;
