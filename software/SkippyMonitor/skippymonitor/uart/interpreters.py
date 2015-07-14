@@ -59,3 +59,32 @@ class M3A3G3PTL:
 
 		# Pressure in hPa
 		self.pressure = self.pressure / 100
+
+class AT_YPRf:
+	"""	Yaw, pitch, roll as floats
+	"""
+
+	yaw = 0
+	pitch = 0
+	roll = 0
+
+	def __init__(self):
+		pass
+
+	def decode(self, string):
+		data = string.rstrip('\r\n').split()
+
+		if data[0] != 'AT':
+			return;
+
+		if len(data) != 4:
+			raise Exception('Unable to decode data string: {datastr}'.format(datastr=string))
+
+		self.pitch = unpack('!f', bytes.fromhex(data[1]))[0]
+		self.yaw = unpack('!f', bytes.fromhex(data[2]))[0]
+		self.roll = unpack('!f', bytes.fromhex(data[3]))[0]
+
+		self.normalize()
+
+	def normalize(self):
+		pass

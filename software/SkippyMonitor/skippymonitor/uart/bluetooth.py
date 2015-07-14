@@ -13,7 +13,7 @@ class BluetoothSerial:
 		self.sfile = self.socket.makefile()
 
 	def write(self, data):
-		self.sfile.write(data)
+		self.socket.send(bytes(data, 'UTF-8'))
 
 	def readline(self):
 		return self.sfile.readline()

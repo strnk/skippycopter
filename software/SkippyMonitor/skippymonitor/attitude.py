@@ -25,8 +25,6 @@ class AttitudeWidget(QGLWidget):
         self.timer.start()
 
     def paintGL(self):
-        #print("Y {yaw}  P {pitch}  R {roll}".format(yaw=self.yaw, pitch=self.pitch, roll=self.roll))
-
         glClearColor(0.0, 0.0, 0.0, 0.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
@@ -103,7 +101,6 @@ class AttitudeWidget(QGLWidget):
         self.yaw = yaw
         self.pitch = pitch
         self.roll = roll
-        #print("Y {yaw}  P {pitch}  R {roll}".format(yaw=yaw, pitch=pitch, roll=roll))
     
 
 class AttitudeWindow(QDialog):
@@ -111,7 +108,6 @@ class AttitudeWindow(QDialog):
         super(AttitudeWindow, self).__init__(parent)
         self.interpreter = interpreterClass()
         self.setupUi()
-        self.fusion = Madgwick2011()
 
     def setupUi(self):
         self.setObjectName("AttitudeWindow")
@@ -127,14 +123,4 @@ class AttitudeWindow(QDialog):
 
     def newData(self, data):
         self.interpreter.decode(data)
-
-        gx = self.interpreter.gyro.x * (2*pi / 360)
-        gy = self.interpreter.gyro.y * (2*pi / 360)
-        gz = self.interpreter.gyro.z * (2*pi / 360)
-
-        self.fusion.update(gx, gy, gz, 
-            self.interpreter.accel.x, self.interpreter.accel.y, self.interpreter.accel.z, 
-            self.interpreter.mag.x, self.interpreter.mag.y, self.interpreter.mag.z)
-
-        yaw, pitch, roll = self.fusion.to_euler()
-        self.glAttitude.setOrientation(180*(yaw/pi), 180*(pitch/pi), 180*(roll/pi))
+        self.glAttitude.setOrientation(self.interpreter.yaw, self.interpreter.pitch, self.interpreter.roll)

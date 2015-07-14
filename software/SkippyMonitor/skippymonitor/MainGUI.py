@@ -25,12 +25,19 @@ class MainWindow(QtWidgets.QMainWindow, MainUI.Ui_MainWindow):
     calibration = None
     bRedirectData = False
 
-    def __init__(self, linkType, interpreterClass, parent=None):
+    def __init__(self, linkType, interpreterClass, serial, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
         self.Interpreter = interpreterClass
         self.linkType = linkType
         self.statusBar.showMessage("Connected on " + linkType)
+        self.serial = serial
+        self.edit_input.returnPressed.connect(self.on_btn_send_clicked)
+
+    @pyqtSlot(bool)
+    def on_btn_send_clicked(self):
+        self.serial.write(self.edit_input.text() + "\n")
+        self.edit_input.setText("")
 
     @pyqtSlot(bool)
     def on_actionAbout_triggered(self, checked):
@@ -52,13 +59,15 @@ class MainWindow(QtWidgets.QMainWindow, MainUI.Ui_MainWindow):
 
     @pyqtSlot(bool)
     def on_action3D_Attitude_triggered(self, checked):
-        self.AttitudeWindow = AttitudeWindow(self.Interpreter, self)
+        self.AttitudeWindow = AttitudeWindow(AT_YPRf, self)
         self.AttitudeWindow.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.AttitudeWindow.destroyed.connect(self.on_attitudeWindow_closed)
+        self.serial.write("fe raw_attitude\n");
         self.bRedirectData = True
         self.AttitudeWindow.show()
 
     def on_attitudeWindow_closed(self):
+        self.serial.write("fd raw_attitude\n");
         self.bRedirectData = False
         self.AttitudeWindow = None
 
@@ -149,7 +158,7 @@ class MainGUI:
         self.Interpreter = eval(self.options.imuDataInterpreterClass)
 
         app = QtWidgets.QApplication(sys.argv)
-        main = MainWindow(linkType, self.Interpreter)
+        main = MainWindow(linkType, self.Interpreter, self.Serial)
 
         try:
             self.Serial.open()
