@@ -9,6 +9,8 @@
 
 // GPS port
 #define RCC_UART_GPS		RCC_USART1
+#define IRQ_UART_GPS		NVIC_USART1_IRQ
+#define usart_gps_isr		usart1_isr
 #define UART_GPS 			USART1
 
 // Debug port
@@ -19,6 +21,8 @@
 
 // Telemetry port
 #define RCC_UART_TELEMETRY	RCC_UART4
+#define IRQ_UART_TELEMETRY	NVIC_UART4_IRQ
+#define usart_telemetry_isr uart4_isr
 #define UART_TELEMETRY		UART4
 
 // Low PWM group

@@ -27,7 +27,7 @@ void gpio_setup(void)
     gpio_set_af(GPIOA, GPIO_AF4, GPIO8);
 
     /* PA9/10 as USART1 TX/RX */
-    gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO10 | GPIO11);
+    gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO9 | GPIO10);
     gpio_set_af(GPIOA, GPIO_AF7, GPIO9 | GPIO10);
 
     /* PB1 as TIM3 CH4 */
@@ -69,4 +69,5 @@ void gpio_setup(void)
 
     // Enable UARTs clocks
     rcc_periph_clock_enable(RCC_UART_DEBUG);
+    rcc_periph_clock_enable(RCC_UART_GPS);
 }

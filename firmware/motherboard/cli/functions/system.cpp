@@ -31,6 +31,8 @@ flag_set(char *name, uint8_t value)
 		cli_flags.orientation_reporting = value;
 	else if (!strcmp(name, "raw_attitude"))
 		cli_flags.raw_attitude = value;
+	else if (!strcmp(name, "gps_proxy"))
+		cli_flags.gps_proxy = value;
 	else
 		return 1;
 

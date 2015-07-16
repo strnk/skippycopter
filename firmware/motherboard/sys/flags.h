@@ -9,6 +9,7 @@ typedef struct {
 	int	data_reporting 	: 1;
 	int orientation_reporting : 1;
 	int raw_attitude : 1;
+	int gps_proxy : 1;
 } cli_flags_t;
 
 #ifndef IN_FLAGS_C

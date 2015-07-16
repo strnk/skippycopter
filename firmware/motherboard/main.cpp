@@ -6,6 +6,7 @@
 #include <cli/cli.h>
 #include <system/system.h>
 #include <sys/flags.h>
+#include <gps/gps.h>
 #include "board_setup.h"
 #include "led.h"
 #include "common.h"
@@ -108,6 +109,8 @@ main(void)
 
     imu.init();
 
+    GPSHandler.init();
+
     pwm_lo.init(84, 20000);
 
     // Initialize the motors
@@ -137,6 +140,9 @@ main(void)
 
         if (CLIHandler.pending)
         	CLIHandler.trigger();
+
+        if (GPSHandler.pending)
+            GPSHandler.trigger();
 
         imu.checkPending();
 	}

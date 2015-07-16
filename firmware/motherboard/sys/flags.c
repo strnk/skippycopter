@@ -9,4 +9,5 @@ flags_setup(void)
 	cli_flags.data_reporting = 0;
 	cli_flags.orientation_reporting = 0;
 	cli_flags.raw_attitude = 0;
+	cli_flags.gps_proxy = 0;
 }
