@@ -2,6 +2,7 @@ from skippymonitor.ui import AboutUI, MainUI
 from skippymonitor.uart import direct, bluetooth, thread
 from skippymonitor.imu_debug import PlotWindow
 from skippymonitor.attitude import AttitudeWindow
+from skippymonitor.gps import GPSWindow
 from skippymonitor.uart.interpreters import *
 from skippymonitor.calibration import IMUCalibration
 
@@ -22,6 +23,7 @@ class AboutDialog(QtWidgets.QDialog, AboutUI.Ui_Dialog):
 class MainWindow(QtWidgets.QMainWindow, MainUI.Ui_MainWindow):
     IMUWindow = None
     AttitudeWindow = None
+    GPSWindow = None
     calibration = None
     bRedirectData = False
 
@@ -58,16 +60,30 @@ class MainWindow(QtWidgets.QMainWindow, MainUI.Ui_MainWindow):
         self.IMUWindow = None
 
     @pyqtSlot(bool)
+    def on_actionGPS_triggered(self, checked):
+        self.GPSWindow = GPSWindow(self)
+        self.GPSWindow.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        self.GPSWindow.destroyed.connect(self.on_gpsWindow_closed)
+        self.serial.write("fe gps_proxy\n")
+        self.bRedirectData = True
+        self.GPSWindow.show()
+
+    def on_gpsWindow_closed(self):
+        self.serial.write("fd gps_proxy\n")
+        self.bRedirectData = False
+        self.GPSWindow = None
+
+    @pyqtSlot(bool)
     def on_action3D_Attitude_triggered(self, checked):
         self.AttitudeWindow = AttitudeWindow(AT_YPRf, self)
         self.AttitudeWindow.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.AttitudeWindow.destroyed.connect(self.on_attitudeWindow_closed)
-        self.serial.write("fe raw_attitude\n");
+        self.serial.write("fe raw_attitude\n")
         self.bRedirectData = True
         self.AttitudeWindow.show()
 
     def on_attitudeWindow_closed(self):
-        self.serial.write("fd raw_attitude\n");
+        self.serial.write("fd raw_attitude\n")
         self.bRedirectData = False
         self.AttitudeWindow = None
 
@@ -113,6 +129,8 @@ class MainWindow(QtWidgets.QMainWindow, MainUI.Ui_MainWindow):
                 self.AttitudeWindow.newData(string)
             if self.calibration != None:
                 self.calibration.newData(string)
+            if self.GPSWindow != None:
+                self.GPSWindow.newData(string)
 
 
 class MainGUI:

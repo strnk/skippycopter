@@ -120,6 +120,7 @@
    <addaction name="actionRecord_IMU"/>
    <addaction name="actionCalibrate"/>
    <addaction name="action3D_Attitude"/>
+   <addaction name="actionGPS"/>
   </widget>
   <action name="actionAbout">
    <property name="text">
@@ -211,6 +212,15 @@
    </property>
    <property name="text">
     <string>3D Attitude</string>
+   </property>
+  </action>
+  <action name="actionGPS">
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/icon/tango-32x32/devices/network-wireless.png</normaloff>:/icon/tango-32x32/devices/network-wireless.png</iconset>
+   </property>
+   <property name="text">
+    <string>GPS</string>
    </property>
   </action>
  </widget>
