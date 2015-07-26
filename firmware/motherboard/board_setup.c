@@ -50,9 +50,17 @@ void gpio_setup(void)
     gpio_mode_setup(GPIOB, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO14);
     gpio_mode_setup(GPIOB, GPIO_MODE_INPUT, GPIO_PUPD_NONE, GPIO15);
 
-    /* PC6/7/8 as TIM3 CH1/2/3 */
+    /* PC6/7 as TIM3 CH1/2 */
     gpio_mode_setup(GPIOC, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO6 | GPIO7 | GPIO8);
-    gpio_set_af(GPIOC, GPIO_AF2, GPIO6 | GPIO7 | GPIO8);
+    gpio_set_af(GPIOC, GPIO_AF2, GPIO6 | GPIO7);
+
+    #ifdef USE_PPM_INPUT
+    /* PC8 as TIM8 CH3 */
+    gpio_set_af(GPIOC, GPIO_AF3, GPIO8);
+    #else
+    /* PC8 as TIM3 CH3 */
+    gpio_set_af(GPIOC, GPIO_AF2, GPIO8);
+    #endif
 
     /* PC9 as I2C3 SDA */
     gpio_mode_setup(GPIOC, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO9);
@@ -66,6 +74,7 @@ void gpio_setup(void)
     // Enable timers clocks
     rcc_periph_clock_enable(RCC_PWM_LO_TIMER);
     rcc_periph_clock_enable(RCC_PWM_HI_TIMER);
+    rcc_periph_clock_enable(RCC_PPM_TIMER);
 
     // Enable UARTs clocks
     rcc_periph_clock_enable(RCC_UART_DEBUG);

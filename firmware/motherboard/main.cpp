@@ -3,6 +3,7 @@
 #include <periph/sys_scheduler.h>
 #include <debug/performance.h>
 #include <periph/pwm.h>
+#include <periph/ppm.h>
 #include <cli/cli.h>
 #include <system/system.h>
 #include <sys/flags.h>
@@ -16,15 +17,16 @@ System sys(I2C_SYSTEM, RCC_I2C_SYSTEM);
 IMU imu(I2C_SENSOR, RCC_I2C_SENSOR);
 PWM pwm_lo(PWM_LO_TIMER, 1060, 1860);
 PWM pwm_hi(PWM_HI_TIMER, 1060, 1860);
+PPM ppm(PPM_TIMER, 6);
 
-void toggle(uint32_t* data) {
+void toggle(__attribute__((unused)) uint32_t* data) {
 	/* Toggle LEDs. */
 	led_toggle(LED1 | LED2);
 	perf_validate();
 }
 
-void display_data(uint32_t* data) {
-	if (cli_flags.data_reporting) {
+void display_data(__attribute__((unused)) uint32_t* data) {
+	if (FLAG(data_reporting)) {
     	puts("");
     	// in mG (gauss)
     	printf("Magneto : %.2f %.2f %.2f\n", imu.magneto.x, imu.magneto.y, imu.magneto.z);
@@ -46,21 +48,21 @@ void display_data(uint32_t* data) {
     		perf_counter_value(PERF_IMU_PRESS));
     }
 
-    if (cli_flags.orientation_reporting) {
+    if (FLAG(orientation_reporting)) {
         orientation_t orientation = imu.getOrientation();
 
         printf("YAW: %03.2f  PITCH: %03.2f  ROLL: %03.2f\n", orientation.yaw, orientation.pitch, orientation.roll);
     }
 }
 
-void display_raw_data(uint32_t* data) {
-    orientation_t orientation;
-    uint32_t* yaw = (uint32_t*)(&orientation.yaw);
-    uint32_t* pitch = (uint32_t*)(&orientation.pitch); 
-    uint32_t* roll = (uint32_t*)(&orientation.roll);  
-    orientation = imu.getOrientation();
+void display_raw_data(__attribute__((unused)) uint32_t* data) {
+    if (FLAG(raw_attitude)) {
+        orientation_t orientation;
+        uint16_t* yaw = (uint16_t*)(&orientation.yaw);
+        uint16_t* pitch = (uint16_t*)(&orientation.pitch); 
+        uint16_t* roll = (uint16_t*)(&orientation.roll);  
+        orientation = imu.getOrientation();
 
-    if (cli_flags.raw_attitude) {
         printf("AT %04X %04X %04X\n", *yaw, *pitch, *roll);
     }
 }
@@ -72,7 +74,6 @@ main(void)
 	clock_setup();
 	SystemScheduler.init();
 
-    flags_setup();
 	gpio_setup();
 	CLIHandler.init();
     sys.setup();
@@ -111,7 +112,9 @@ main(void)
 
     GPSHandler.init();
 
+    // Initialize PWMs with 20ms period
     pwm_lo.init(84, 20000);
+    pwm_hi.init(84, 20000);
 
     // Initialize the motors
     pwm_lo.arm(PWM1_CHANNEL);
@@ -124,6 +127,17 @@ main(void)
     pwm_lo.set_pulse_width(PWM3_CHANNEL, 1060);
     pwm_lo.set_pulse_width(PWM4_CHANNEL, 1060);
 
+#ifndef USE_PPM_INPUT
+    pwm_hi.arm(PWM5_CHANNEL);
+#endif
+    pwm_hi.arm(PWM6_CHANNEL);
+    pwm_hi.arm(PWM7_CHANNEL);
+    pwm_hi.arm(PWM8_CHANNEL);
+
+    // Initialize PPM with 20ms period
+    ppm.init(PPM_CHANNEL, PPM_TIMER_INPUT);
+
+    // Set up the system tasks
     SystemScheduler.registerTask(SYS_SCHEDULER_S(1), toggle);
     SystemScheduler.registerTask(SYS_SCHEDULER_S(1), display_data);
     SystemScheduler.registerTask(SYS_SCHEDULER_MS(10), display_raw_data);

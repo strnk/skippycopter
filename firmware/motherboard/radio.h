@@ -1,0 +1,44 @@
+#ifndef RADIO_H
+#define RADIO_H
+
+
+#define PPM_DATA_MIN	860
+#define PPM_DATA_MAX	2050
+
+#define PPM_BLANK_MIN	8200
+#define PPM_BLANK_MAX	15400
+
+#define RADIO_CHANNELS	6
+
+#define RADIO_THR		3
+#define RADIO_ROLL		1
+#define RADIO_PITCH		2
+#define RADIO_YAW		4
+#define RADIO_AUX1		5
+#define RADIO_AUX2		6
+
+
+#define RADIO_THR_NEUTRAL	864
+#define RADIO_THR_MIN		864
+#define RADIO_THR_MAX		2046
+
+#define RADIO_ROLL_NEUTRAL	1452
+#define RADIO_ROLL_MIN		860
+#define RADIO_ROLL_MAX		2042
+
+#define RADIO_PITCH_NEUTRAL	1452
+#define RADIO_PITCH_MIN		860
+#define RADIO_PITCH_MAX		2030
+
+#define RADIO_YAW_NEUTRAL	1445
+#define RADIO_YAW_MIN		866
+#define RADIO_YAW_MAX		2048
+
+#define RADIO_AUX1_NEUTRAL	867
+#define RADIO_AUX1_MIN		867
+#define RADIO_AUX1_MAX		2049
+
+#define RADIO_AUX2_NEUTRAL	1451
+#define RADIO_AUX2_MIN		860
+#define RADIO_AUX2_MAX		2043
+#endif // RADIO_H

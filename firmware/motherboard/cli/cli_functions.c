@@ -15,6 +15,9 @@ const cli_funcdesc_t cli_functions[] = {
 	{ "pwmlo",	1,	cli_func_pwm_pwmlo },
 	{ "pwmhi",	1,	cli_func_pwm_pwmhi },
 
+	// PPM functions
+	{ "ppm",	0, cli_func_system_ppm },
+
 	// Empty record
 	{ "xxx",		0, NULL }
 };

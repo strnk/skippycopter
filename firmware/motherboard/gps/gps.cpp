@@ -51,7 +51,7 @@ GPS::trigger(void)
 {
 	pending = false;
 
-	if (cli_flags.gps_proxy)
+	if (FLAG(gps_proxy))
 		printf("GPS %s\n", uart_gps_rx_read_buffer);
 }
 

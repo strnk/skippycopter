@@ -32,8 +32,8 @@ Powerboard::update(void)
 	raw_intensity_avg = read16(PWB_REG_READ_INTENSITY_AVG);
 
 	voltage = raw_voltage * 0.027275391;
-	intensity = (raw_intensity-511) * 0.02;
+	intensity = (raw_intensity-511) * 0.244140625;
 	
-	intensity_avg = (raw_intensity_avg-511) * 0.02;
+	intensity_avg = (raw_intensity_avg-511) * 0.244140625;
 	voltage_avg = raw_voltage_avg * 0.027275391;
 }

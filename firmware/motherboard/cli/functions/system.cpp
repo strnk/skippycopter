@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <system/system.h>
+#include <periph/ppm.h>
 #include <sys/flags.h>
 #include <string.h>
 #include "system.h"
@@ -22,33 +23,27 @@ cli_func_system_power(int argc, char **argv)
 	printf("I= %.3fA\n", sys.powerboard.intensity_avg);
 }
 
-uint8_t
-flag_set(char *name, uint8_t value)
-{
-	if (!strcmp(name, "data_reporting"))
-		cli_flags.data_reporting = value;
-	else if (!strcmp(name, "orientation_reporting"))
-		cli_flags.orientation_reporting = value;
-	else if (!strcmp(name, "raw_attitude"))
-		cli_flags.raw_attitude = value;
-	else if (!strcmp(name, "gps_proxy"))
-		cli_flags.gps_proxy = value;
-	else
-		return 1;
-
-	return 0;
-}
-
 extern "C"
 uint8_t
 cli_func_system_flag_enable(int argc, char **argv)
 {
-	return flag_set(argv[1], 1);
+	return setFlagValue(argv[1], 1);
 }
 
 extern "C"
 uint8_t
 cli_func_system_flag_disable(int argc, char **argv)
 {
-	return flag_set(argv[1], 0);
+	return setFlagValue(argv[1], 0);
+}
+
+extern "C"
+uint8_t
+cli_func_system_ppm(int argc, char **argv)
+{
+	extern PPM ppm;
+
+	printf("PPM values (%d invalid):\n", ppm.invalid_frames);
+	for (int i = 0; i <= ppm.channels; i++)
+		printf("%d: %ld\n", i, ppm.pulses[i]/6);
 }
