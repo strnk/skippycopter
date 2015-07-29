@@ -6,6 +6,7 @@
 #include <periph/ppm.h>
 #include <cli/cli.h>
 #include <system/system.h>
+#include <radio/radio.h>
 #include <sys/flags.h>
 #include <gps/gps.h>
 #include "board_setup.h"
@@ -18,6 +19,7 @@ IMU imu(I2C_SENSOR, RCC_I2C_SENSOR);
 PWM pwm_lo(PWM_LO_TIMER, 1060, 1860);
 PWM pwm_hi(PWM_HI_TIMER, 1060, 1860);
 PPM ppm(PPM_TIMER, 6);
+Radio radio;
 
 void toggle(__attribute__((unused)) uint32_t* data) {
 	/* Toggle LEDs. */
@@ -55,16 +57,26 @@ void display_data(__attribute__((unused)) uint32_t* data) {
     }
 }
 
-void display_raw_data(__attribute__((unused)) uint32_t* data) {
-    if (FLAG(raw_attitude)) {
-        orientation_t orientation;
-        uint16_t* yaw = (uint16_t*)(&orientation.yaw);
-        uint16_t* pitch = (uint16_t*)(&orientation.pitch); 
-        uint16_t* roll = (uint16_t*)(&orientation.roll);  
-        orientation = imu.getOrientation();
+void msg_periodic_fastest(__attribute__((unused)) uint32_t* data) {
+    if (FLAG(msg_at)) {
+        orientation_t orientation = imu.getOrientation();
 
-        printf("AT %04X %04X %04X\n", *yaw, *pitch, *roll);
+        printf("$AT %08X %08X %08X\n", floatAsU32(orientation.yaw), floatAsU32(orientation.pitch), floatAsU32(orientation.roll));
     }
+}
+
+void msg_periodic_fast(__attribute__((unused)) uint32_t* data) {
+    // Nothing ATM
+}
+
+void msg_periodic_slow(__attribute__((unused)) uint32_t* data) {
+    if (FLAG(msg_pow)) {
+        printf("$POW %08X %08X\n", floatAsU32(sys.powerboard.voltage_avg), floatAsU32(sys.powerboard.intensity_avg));
+    }
+}
+
+void msg_periodic_slowest(__attribute__((unused)) uint32_t* data) {
+    // Nothing ATM
 }
 
 extern "C" 
@@ -140,7 +152,12 @@ main(void)
     // Set up the system tasks
     SystemScheduler.registerTask(SYS_SCHEDULER_S(1), toggle);
     SystemScheduler.registerTask(SYS_SCHEDULER_S(1), display_data);
-    SystemScheduler.registerTask(SYS_SCHEDULER_MS(10), display_raw_data);
+
+    // System message handlers
+    SystemScheduler.registerTask(SYS_SCHEDULER_MS(10), msg_periodic_fastest);
+    SystemScheduler.registerTask(SYS_SCHEDULER_MS(100), msg_periodic_fast);
+    SystemScheduler.registerTask(SYS_SCHEDULER_MS(500), msg_periodic_slow);
+    SystemScheduler.registerTask(SYS_SCHEDULER_S(1), msg_periodic_slowest);
 
     // Display the prompt on the debug interface
     CLIHandler.prompt();
@@ -157,6 +174,18 @@ main(void)
 
         if (GPSHandler.pending)
             GPSHandler.trigger();
+
+        if (ppm.pending) {
+            radio.update_from_ppm((uint32_t*)ppm.pulses);
+            ppm.pending = false;
+
+            if (radio.cmd.aux1 < 50.0) {
+                pwm_lo.set_throttle(PWM1_CHANNEL, 0);
+            }
+            else {
+                pwm_lo.set_throttle(PWM1_CHANNEL, (uint16_t)(radio.cmd.throttle * 10));
+            }
+        }
 
         imu.checkPending();
 	}

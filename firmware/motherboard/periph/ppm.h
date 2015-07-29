@@ -7,6 +7,8 @@
 #include <libopencm3/stm32/timer.h>
 
 #define PPM_MAX_CHANNELS	10
+#define PPM_TICKS_TO_USEC(x)	((x)/6)
+#define PPM_USEC_TO_TICKS(x)	((x)*6)
 
 
 class PPM

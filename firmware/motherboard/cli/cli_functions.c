@@ -18,6 +18,9 @@ const cli_funcdesc_t cli_functions[] = {
 	// PPM functions
 	{ "ppm",	0, cli_func_system_ppm },
 
+	// Radio functions
+	{ "radio",	0, cli_func_system_radio },
+
 	// Empty record
 	{ "xxx",		0, NULL }
 };

@@ -1,9 +1,11 @@
-#ifndef RADIO_H
-#define RADIO_H
+#ifndef RADIO_CONFIG_H
+#define RADIO_CONFIG_H
 
+#define RADIO_CMD_MAX	100.0
+#define RADIO_CMD_MIN	-100.0
 
-#define PPM_DATA_MIN	860
-#define PPM_DATA_MAX	2050
+#define PPM_DATA_MIN	850
+#define PPM_DATA_MAX	2100
 
 #define PPM_BLANK_MIN	8200
 #define PPM_BLANK_MAX	15400
@@ -41,4 +43,5 @@
 #define RADIO_AUX2_NEUTRAL	1451
 #define RADIO_AUX2_MIN		860
 #define RADIO_AUX2_MAX		2043
-#endif // RADIO_H
+
+#endif // RADIO_CONFIG_H

@@ -3,6 +3,8 @@
 
 #include <inttypes.h>
 
+#define floatAsU32(x)   (*((uint32_t*)(&(x))))
+
 typedef struct
 {
 	int16_t x;

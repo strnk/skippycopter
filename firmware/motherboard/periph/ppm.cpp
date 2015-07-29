@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <periph/ppm.h>
 #include <config.h>
-#include <radio.h>
+#include <radio_config.h>
 
-#define PPM_TICKS_TO_USEC(x)	(x/6)
 
 static uint32_t ppm_overflow = 0;
 PPM* ppmHandler;

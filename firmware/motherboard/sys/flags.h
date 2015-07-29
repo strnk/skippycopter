@@ -13,8 +13,9 @@ extern "C" {
 BEGIN_FLAGS()
     DECL_FLAG(data_reporting);
     DECL_FLAG(orientation_reporting);
-    DECL_FLAG(raw_attitude);
-    DECL_FLAG(gps_proxy);
+    DECL_FLAG(msg_at);
+    DECL_FLAG(msg_gps);
+    DECL_FLAG(msg_pow);
 END_FLAGS()
 
 

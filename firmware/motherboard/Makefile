@@ -11,7 +11,7 @@ FIRMWARE	 = motherboard
 
 LDSCRIPT	 = stm32f4.ld
 SRC			 = sys/cppheap.cpp sys/flags.c periph/sys_scheduler.cpp board_setup.c led.c periph/i2c_device.cpp \
-	periph/pwm.cpp periph/ppm.cpp \
+	periph/pwm.cpp periph/ppm.cpp radio/radio.cpp \
 	imu/fusion/madgwick.cpp imu/hmc5883l.cpp imu/adxl345.cpp imu/bmp085.cpp imu/l3g4200d.cpp imu/imu.cpp \
 	cli/functions/system.cpp cli/functions/pwm.cpp cli/cli_functions.c cli/cli.cpp \
 	system/powerboard.cpp system/system.cpp gps/gps.cpp \

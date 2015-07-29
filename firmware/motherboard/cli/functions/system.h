@@ -12,6 +12,7 @@ uint8_t cli_func_system_power(int argc, char **argv);
 uint8_t cli_func_system_flag_enable(int argc, char **argv);
 uint8_t cli_func_system_flag_disable(int argc, char **argv);
 uint8_t cli_func_system_ppm(int argc, char **argv);
+uint8_t cli_func_system_radio(int argc, char **argv);
 
 #ifdef __cplusplus
 }
