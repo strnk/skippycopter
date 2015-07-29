@@ -124,3 +124,8 @@ class AttitudeWindow(QDialog):
     def newData(self, data):
         self.interpreter.decode(data)
         self.glAttitude.setOrientation(self.interpreter.yaw, self.interpreter.pitch, self.interpreter.roll)
+
+    def newMessage(self, message, data):
+        if message == 'AT':
+            self.interpreter.decode(data)
+            self.glAttitude.setOrientation(self.interpreter.yaw, self.interpreter.pitch, self.interpreter.roll)

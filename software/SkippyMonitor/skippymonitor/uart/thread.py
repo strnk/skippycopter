@@ -3,25 +3,26 @@ import threading
 import time
  
 class QtReader(QtCore.QThread):
-    lineUpdate = QtCore.pyqtSignal(object)  
+    newLine = QtCore.pyqtSignal(object)
+    newMessage = QtCore.pyqtSignal(object, object)
     notStopped = True
 
     def __init__(self, serial):
         QtCore.QThread.__init__(self)
         self.serial = serial
-        self.addLine("Run")
         
     def run(self):
         while self.notStopped:
             line = self.serial.readline()
 
             if len(line):
-                self.addLine(line)
+                if line[0] == '$':
+                    message = line.split(' ', 1)
+                    self.newMessage.emit(message[0][1:].strip(), message[1].strip())
+                else:
+                    self.newLine.emit(line)
             else:
                 time.sleep(.01)
-
-    def addLine(self, line):
-        self.lineUpdate.emit(line)
 
     def stop(self):
         self.notStopped = False

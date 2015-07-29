@@ -6,6 +6,11 @@ from skippymonitor.gps import GPSWindow
 from skippymonitor.uart.interpreters import *
 from skippymonitor.calibration import IMUCalibration
 
+from skippymonitor.sysmsg import MessageProxy
+
+from skippymonitor.widgets.msgdebug import MainSystemMessageHandler
+from skippymonitor.widgets.power import PowerIndicator
+
 from optparse import OptionParser
 
 from PyQt5 import QtWidgets, QtCore, QtGui
@@ -27,6 +32,8 @@ class MainWindow(QtWidgets.QMainWindow, MainUI.Ui_MainWindow):
     calibration = None
     bRedirectData = False
 
+    msgProxy = None
+
     def __init__(self, linkType, interpreterClass, serial, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
@@ -35,6 +42,13 @@ class MainWindow(QtWidgets.QMainWindow, MainUI.Ui_MainWindow):
         self.statusBar.showMessage("Connected on " + linkType)
         self.serial = serial
         self.edit_input.returnPressed.connect(self.on_btn_send_clicked)
+        self.sysMsgHandler = MainSystemMessageHandler(self.sysMsgList, self.sysMsgCfg)
+
+        self.msgProxy = MessageProxy(self.serial)
+        self.msgProxy.addObject(self.sysMsgHandler, [ '*' ])
+
+        self.statusPower = PowerIndicator(self)
+        self.msgProxy.addObject(self.statusPower, [ 'POW' ])
 
     @pyqtSlot(bool)
     def on_btn_send_clicked(self):
@@ -64,13 +78,11 @@ class MainWindow(QtWidgets.QMainWindow, MainUI.Ui_MainWindow):
         self.GPSWindow = GPSWindow(self)
         self.GPSWindow.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.GPSWindow.destroyed.connect(self.on_gpsWindow_closed)
-        self.serial.write("fe gps_proxy\n")
-        self.bRedirectData = True
+        self.msgProxy.addObject(self.GPSWindow, [ 'GPS' ])
         self.GPSWindow.show()
 
     def on_gpsWindow_closed(self):
-        self.serial.write("fd gps_proxy\n")
-        self.bRedirectData = False
+        self.msgProxy.removeObject(self.GPSWindow)
         self.GPSWindow = None
 
     @pyqtSlot(bool)
@@ -78,13 +90,11 @@ class MainWindow(QtWidgets.QMainWindow, MainUI.Ui_MainWindow):
         self.AttitudeWindow = AttitudeWindow(AT_YPRf, self)
         self.AttitudeWindow.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.AttitudeWindow.destroyed.connect(self.on_attitudeWindow_closed)
-        self.serial.write("fe raw_attitude\n")
-        self.bRedirectData = True
+        self.msgProxy.addObject(self.AttitudeWindow, [ 'AT' ])
         self.AttitudeWindow.show()
 
     def on_attitudeWindow_closed(self):
-        self.serial.write("fd raw_attitude\n")
-        self.bRedirectData = False
+        self.msgProxy.removeObject(self.AttitudeWindow)
         self.AttitudeWindow = None
 
     @pyqtSlot(bool)
@@ -117,21 +127,13 @@ class MainWindow(QtWidgets.QMainWindow, MainUI.Ui_MainWindow):
         self.bRedirectData = False
 
     def addLine(self, string):
-        if not self.bRedirectData:
-            newText = self.plainTextEdit.toPlainText() + string
-            self.plainTextEdit.setPlainText('\n'.join((newText.split('\n'))[-50:]))
-            self.plainTextEdit.moveCursor(QtGui.QTextCursor.End)
-            self.plainTextEdit.ensureCursorVisible()
-        else:
-            if self.IMUWindow != None:
-                self.IMUWindow.newData(string)
-            if self.AttitudeWindow != None:
-                self.AttitudeWindow.newData(string)
-            if self.calibration != None:
-                self.calibration.newData(string)
-            if self.GPSWindow != None:
-                self.GPSWindow.newData(string)
+        newText = self.plainTextEdit.toPlainText() + string
+        self.plainTextEdit.setPlainText('\n'.join((newText.split('\n'))[-50:]))
+        self.plainTextEdit.moveCursor(QtGui.QTextCursor.End)
+        self.plainTextEdit.ensureCursorVisible()
 
+    def handleMessage(self, message, data):
+        self.msgProxy.relayMessage(message, data)
 
 class MainGUI:
     def __init__(self):
@@ -176,7 +178,6 @@ class MainGUI:
         self.Interpreter = eval(self.options.imuDataInterpreterClass)
 
         app = QtWidgets.QApplication(sys.argv)
-        main = MainWindow(linkType, self.Interpreter, self.Serial)
 
         try:
             self.Serial.open()
@@ -185,10 +186,12 @@ class MainGUI:
                 "Unable to open " + linkType, QMessageBox.Close, QMessageBox.Close)
             return
 
+        main = MainWindow(linkType, self.Interpreter, self.Serial)
         main.show()
 
         self.SerialThread = thread.QtReader(self.Serial)
-        self.SerialThread.lineUpdate.connect(main.addLine)
+        self.SerialThread.newLine.connect(main.addLine)
+        self.SerialThread.newMessage.connect(main.handleMessage)
         self.SerialThread.start()
 
         app.exec_()

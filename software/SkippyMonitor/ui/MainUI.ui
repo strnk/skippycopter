@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>718</width>
-    <height>528</height>
+    <width>937</width>
+    <height>530</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,26 +16,34 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QPlainTextEdit" name="plainTextEdit">
-      <property name="documentTitle">
-       <string/>
-      </property>
-      <property name="undoRedoEnabled">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QLineEdit" name="edit_input"/>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_send">
-        <property name="text">
-         <string>Send</string>
-        </property>
-       </widget>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QPlainTextEdit" name="plainTextEdit">
+          <property name="documentTitle">
+           <string/>
+          </property>
+          <property name="undoRedoEnabled">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLineEdit" name="edit_input"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_send">
+            <property name="text">
+             <string>Send</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
@@ -46,7 +54,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>718</width>
+     <width>937</width>
      <height>20</height>
     </rect>
    </property>
@@ -85,7 +93,14 @@
     <addaction name="actionCalibrate"/>
     <addaction name="action3D_Attitude"/>
    </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionHide_system_message_debugger"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuTools"/>
    <addaction name="menuSkippyCopter"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -121,6 +136,45 @@
    <addaction name="actionCalibrate"/>
    <addaction name="action3D_Attitude"/>
    <addaction name="actionGPS"/>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget">
+   <property name="windowTitle">
+    <string>System messages</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <item>
+      <widget class="QSplitter" name="splitter">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <widget class="QTreeWidget" name="sysMsgList">
+        <property name="selectionMode">
+         <enum>QAbstractItemView::ExtendedSelection</enum>
+        </property>
+        <column>
+         <property name="text">
+          <string notr="true">1</string>
+         </property>
+        </column>
+       </widget>
+       <widget class="QTreeWidget" name="sysMsgCfg">
+        <property name="selectionMode">
+         <enum>QAbstractItemView::ExtendedSelection</enum>
+        </property>
+        <column>
+         <property name="text">
+          <string notr="true">1</string>
+         </property>
+        </column>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <action name="actionAbout">
    <property name="text">
@@ -221,6 +275,11 @@
    </property>
    <property name="text">
     <string>GPS</string>
+   </property>
+  </action>
+  <action name="actionHide_system_message_debugger">
+   <property name="text">
+    <string>Hide system message debugger</string>
    </property>
   </action>
  </widget>
